@@ -1,0 +1,290 @@
+[
+    {
+        "codigoProducto": "HM001",
+        "marca": "GolpeMaster",
+        "codigo": "001",
+        "nombre": "Martillo de Carpintero",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 15000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "HM002",
+        "marca": "GolpeMaster",
+        "codigo": "002",
+        "nombre": "Martillo de Bola",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 18000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "DS001",
+        "marca": "Tornix",
+        "codigo": "003",
+        "nombre": "Destornillador Plano",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 5000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "DS002",
+        "marca": "Tornix",
+        "codigo": "004",
+        "nombre": "Destornillador de Cruz",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 5500
+            }
+        ]
+    },
+    {
+        "codigoProducto": "LL001",
+        "marca": "Ajustex",
+        "codigo": "005",
+        "nombre": "Llave Inglesa",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 12000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "LL002",
+        "marca": "Ajustex",
+        "codigo": "006",
+        "nombre": "Llave de Boca Fija",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 10000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "TL001",
+        "marca": "Perforator",
+        "codigo": "007",
+        "nombre": "Taladro Eléctrico",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 45000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "TL002",
+        "marca": "Perforator",
+        "codigo": "008",
+        "nombre": "Taladro Inalámbrico",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 60000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "SR001",
+        "marca": "CortaPro",
+        "codigo": "009",
+        "nombre": "Sierra Circular",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 70000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "SR002",
+        "marca": "CortaPro",
+        "codigo": "010",
+        "nombre": "Sierra de Calar",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 50000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "LJ001",
+        "marca": "Suavix",
+        "codigo": "011",
+        "nombre": "Lijadora Orbital",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 30000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "LJ002",
+        "marca": "Suavix",
+        "codigo": "012",
+        "nombre": "Lijadora de Banda",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 35000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "CM001",
+        "marca": "Cemexito",
+        "codigo": "013",
+        "nombre": "Cemento Portland",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 12000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "AR001",
+        "marca": "Granix",
+        "codigo": "014",
+        "nombre": "Arena Fina",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 8000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "LD001",
+        "marca": "Ladrillux",
+        "codigo": "015",
+        "nombre": "Ladrillo Rojo",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 500
+            }
+        ]
+    },
+    {
+        "codigoProducto": "PT001",
+        "marca": "Colorín",
+        "codigo": "016",
+        "nombre": "Pintura Blanca",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 25000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "BN001",
+        "marca": "Brillax",
+        "codigo": "017",
+        "nombre": "Barniz Transparente",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 15000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "CS001",
+        "marca": "CabezaSegura",
+        "codigo": "018",
+        "nombre": "Casco de Seguridad",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 8000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "GV001",
+        "marca": "ManoFirme",
+        "codigo": "019",
+        "nombre": "Guantes de Trabajo",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 3000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "LT001",
+        "marca": "OjoClaro",
+        "codigo": "020",
+        "nombre": "Lentes de Seguridad",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 5000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "TR001",
+        "marca": "RoscaFix",
+        "codigo": "021",
+        "nombre": "Tornillo de Madera",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 100
+            }
+        ]
+    },
+    {
+        "codigoProducto": "AD001",
+        "marca": "Pegator",
+        "codigo": "022",
+        "nombre": "Adhesivo Multiuso",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 12000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "MD001",
+        "marca": "Medix",
+        "codigo": "023",
+        "nombre": "Cinta Métrica",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 3000
+            }
+        ]
+    },
+    {
+        "codigoProducto": "NV001",
+        "marca": "Nivelux",
+        "codigo": "024",
+        "nombre": "Nivel de Burbuja",
+        "precios": [
+            {
+                "fecha": "2023-05-01",
+                "valor": 7000
+            }
+        ]
+    }
+]
