@@ -1,0 +1,292 @@
+{
+    "info": {
+        "name": "Ferremas API",
+        "description": "Colección de pruebas para las APIs de Ferremas",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Usuarios",
+            "item": [
+                {
+                    "name": "Listar Usuarios",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:8081/api/usuarios/usuario",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "usuarios", "usuario"]
+                        }
+                    }
+                },
+                {
+                    "name": "Crear Usuario",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nombre\": \"Juan\",\n    \"apellido\": \"Perez\",\n    \"run\": \"12345678-9\",\n    \"correo\": \"juan.perez@example.com\",\n    \"rol\": \"ADMIN\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8081/api/usuarios/usuario",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "usuarios", "usuario"]
+                        }
+                    }
+                },
+                {
+                    "name": "Crear Lista de Usuarios",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n    {\n        \"nombre\": \"Juan\",\n        \"apellido\": \"Perez\",\n        \"run\": \"12345678-9\",\n        \"correo\": \"juan.perez@example.com\",\n        \"rol\": \"ADMIN\"\n    },\n    {\n        \"nombre\": \"Maria\",\n        \"apellido\": \"Lopez\",\n        \"run\": \"98765432-1\",\n        \"correo\": \"maria.lopez@example.com\",\n        \"rol\": \"USER\"\n    }\n]"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8081/api/usuarios/usuarios",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "usuarios", "usuarios"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Sucursales",
+            "item": [
+                {
+                    "name": "Listar Sucursales",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:8081/api/suc/sucursal",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "suc", "sucursal"]
+                        }
+                    }
+                },
+                {
+                    "name": "Crear Sucursal",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nombre\": \"Sucursal Centro\",\n    \"direccion\": \"Av. Principal 123\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8081/api/suc/sucursal",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "suc", "sucursal"]
+                        }
+                    }
+                },
+                {
+                    "name": "Crear Lista de Sucursales",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n    {\n        \"nombre\": \"Sucursal Centro\",\n        \"direccion\": \"Av. Principal 123\"\n    },\n    {\n        \"nombre\": \"Sucursal Norte\",\n        \"direccion\": \"Calle Norte 456\"\n    }\n]"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8081/api/suc/sucursales",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "suc", "sucursales"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Boletas",
+            "item": [
+                {
+                    "name": "Listar Boletas",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:8081/api/boleta/boleta",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "boleta", "boleta"]
+                        }
+                    }
+                },
+                {
+                    "name": "Crear Boleta",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"fecha\": \"2023-05-01\",\n    \"total\": 15000,\n    \"cliente\": \"Juan Perez\",\n    \"token\": \"abc123\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8081/api/boleta/boletas",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "boleta", "boletas"]
+                        }
+                    }
+                },
+                {
+                    "name": "Crear Lista de Boletas",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n    {\n        \"fecha\": \"2023-05-01\",\n        \"total\": 15000,\n        \"cliente\": \"Juan Perez\",\n        \"token\": \"abc123\"\n    },\n    {\n        \"fecha\": \"2023-05-02\",\n        \"total\": 20000,\n        \"cliente\": \"Maria Lopez\",\n        \"token\": \"def456\"\n    }\n]"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8081/api/boleta/lBoletas",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "boleta", "lBoletas"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Productos",
+            "item": [
+                {
+                    "name": "Listar Productos",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:8081/api/productos/producto",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "productos", "producto"]
+                        }
+                    }
+                },
+                {
+                    "name": "Crear Producto",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"codigoProducto\": \"HM001\",\n    \"marca\": \"GolpeMaster\",\n    \"codigo\": \"001\",\n    \"nombre\": \"Martillo de Carpintero\",\n    \"modelo\": \"CarpinteroPro\",\n    \"stock\": 50,\n    \"precios\": [\n        {\n            \"fecha\": \"2023-05-01\",\n            \"valor\": 15000\n        }\n    ]\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8081/api/productos/producto",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "productos", "producto"]
+                        }
+                    }
+                },
+                {
+                    "name": "Crear Lista de Productos",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n    {\n        \"codigoProducto\": \"HM001\",\n        \"marca\": \"GolpeMaster\",\n        \"codigo\": \"001\",\n        \"nombre\": \"Martillo de Carpintero\",\n        \"modelo\": \"CarpinteroPro\",\n        \"stock\": 50,\n        \"precios\": [\n            {\n                \"fecha\": \"2023-05-01\",\n                \"valor\": 15000\n            }\n        ]\n    },\n    {\n        \"codigoProducto\": \"HM002\",\n        \"marca\": \"GolpeMaster\",\n        \"codigo\": \"002\",\n        \"nombre\": \"Martillo de Bola\",\n        \"modelo\": \"BolaMax\",\n        \"stock\": 30,\n        \"precios\": [\n            {\n                \"fecha\": \"2023-05-01\",\n                \"valor\": 18000\n            }\n        ]\n    }\n]"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8081/api/productos/productos",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "productos", "productos"]
+                        }
+                    }
+                },
+                {
+                    "name": "Agregar Precios a Producto",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n    {\n        \"fecha\": \"2023-06-01\",\n        \"valor\": 16000\n    },\n    {\n        \"fecha\": \"2023-07-01\",\n        \"valor\": 17000\n    }\n]"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8081/api/productos/producto/1/precios",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "productos", "producto", "1", "precios"]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
