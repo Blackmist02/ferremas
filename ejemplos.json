@@ -4,6 +4,8 @@
         "marca": "GolpeMaster",
         "codigo": "001",
         "nombre": "Martillo de Carpintero",
+        "modelo": "CarpinteroPro",
+        "stock": 50,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -16,6 +18,8 @@
         "marca": "GolpeMaster",
         "codigo": "002",
         "nombre": "Martillo de Bola",
+        "modelo": "BolaMax",
+        "stock": 30,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -28,6 +32,8 @@
         "marca": "Tornix",
         "codigo": "003",
         "nombre": "Destornillador Plano",
+        "modelo": "PlanoFix",
+        "stock": 100,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -40,6 +46,8 @@
         "marca": "Tornix",
         "codigo": "004",
         "nombre": "Destornillador de Cruz",
+        "modelo": "CruzFix",
+        "stock": 80,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -52,6 +60,8 @@
         "marca": "Ajustex",
         "codigo": "005",
         "nombre": "Llave Inglesa",
+        "modelo": "InglesaPro",
+        "stock": 40,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -64,6 +74,8 @@
         "marca": "Ajustex",
         "codigo": "006",
         "nombre": "Llave de Boca Fija",
+        "modelo": "BocaFix",
+        "stock": 60,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -76,6 +88,8 @@
         "marca": "Perforator",
         "codigo": "007",
         "nombre": "Taladro Eléctrico",
+        "modelo": "ElectroDrill",
+        "stock": 25,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -88,6 +102,8 @@
         "marca": "Perforator",
         "codigo": "008",
         "nombre": "Taladro Inalámbrico",
+        "modelo": "WirelessDrill",
+        "stock": 20,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -100,6 +116,8 @@
         "marca": "CortaPro",
         "codigo": "009",
         "nombre": "Sierra Circular",
+        "modelo": "CircularMax",
+        "stock": 15,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -112,6 +130,8 @@
         "marca": "CortaPro",
         "codigo": "010",
         "nombre": "Sierra de Calar",
+        "modelo": "CalarPro",
+        "stock": 10,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -124,6 +144,8 @@
         "marca": "Suavix",
         "codigo": "011",
         "nombre": "Lijadora Orbital",
+        "modelo": "OrbitalPro",
+        "stock": 35,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -136,6 +158,8 @@
         "marca": "Suavix",
         "codigo": "012",
         "nombre": "Lijadora de Banda",
+        "modelo": "BandaMax",
+        "stock": 20,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -148,6 +172,8 @@
         "marca": "Cemexito",
         "codigo": "013",
         "nombre": "Cemento Portland",
+        "modelo": "PortlandMix",
+        "stock": 100,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -160,6 +186,8 @@
         "marca": "Granix",
         "codigo": "014",
         "nombre": "Arena Fina",
+        "modelo": "FinaPlus",
+        "stock": 200,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -172,6 +200,8 @@
         "marca": "Ladrillux",
         "codigo": "015",
         "nombre": "Ladrillo Rojo",
+        "modelo": "RojoFirme",
+        "stock": 500,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -184,6 +214,8 @@
         "marca": "Colorín",
         "codigo": "016",
         "nombre": "Pintura Blanca",
+        "modelo": "BlancoPro",
+        "stock": 50,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -196,6 +228,8 @@
         "marca": "Brillax",
         "codigo": "017",
         "nombre": "Barniz Transparente",
+        "modelo": "TransparenteMax",
+        "stock": 40,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -208,6 +242,8 @@
         "marca": "CabezaSegura",
         "codigo": "018",
         "nombre": "Casco de Seguridad",
+        "modelo": "SeguraPro",
+        "stock": 60,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -220,6 +256,8 @@
         "marca": "ManoFirme",
         "codigo": "019",
         "nombre": "Guantes de Trabajo",
+        "modelo": "FirmeMax",
+        "stock": 120,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -232,6 +270,8 @@
         "marca": "OjoClaro",
         "codigo": "020",
         "nombre": "Lentes de Seguridad",
+        "modelo": "ClaroPro",
+        "stock": 80,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -244,6 +284,8 @@
         "marca": "RoscaFix",
         "codigo": "021",
         "nombre": "Tornillo de Madera",
+        "modelo": "MaderaFix",
+        "stock": 1000,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -256,6 +298,8 @@
         "marca": "Pegator",
         "codigo": "022",
         "nombre": "Adhesivo Multiuso",
+        "modelo": "MultiPeg",
+        "stock": 150,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -268,6 +312,8 @@
         "marca": "Medix",
         "codigo": "023",
         "nombre": "Cinta Métrica",
+        "modelo": "MetricaPro",
+        "stock": 200,
         "precios": [
             {
                 "fecha": "2023-05-01",
@@ -280,6 +326,8 @@
         "marca": "Nivelux",
         "codigo": "024",
         "nombre": "Nivel de Burbuja",
+        "modelo": "BurbujaMax",
+        "stock": 50,
         "precios": [
             {
                 "fecha": "2023-05-01",

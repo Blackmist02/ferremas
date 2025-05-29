@@ -29,6 +29,8 @@ public class Productos {
     private String marca;
     private String codigo;
     private String nombre;
+    private String modelo;
+    private Integer Stock;
 
 
     @ElementCollection
