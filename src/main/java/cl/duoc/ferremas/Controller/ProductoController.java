@@ -18,6 +18,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 @RestController
 @RequestMapping("/api/productos")
 public class ProductoController {
