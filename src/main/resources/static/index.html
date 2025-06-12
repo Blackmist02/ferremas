@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferretería Online - Inicio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="https://placehold.co/32x32/7C3AED/FFFFFF?text=F" type="image/png">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header -->
+    <div id="header"></div>
+
+    <!-- Hero Section -->
+    <section class="bg-cover bg-center py-20 lg:py-32 rounded-b-lg" style="background-image: url('https://placehold.co/1920x600/4C1D95/E9D5FF?text=¡Todo+para+tu+Proyecto!')">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-lg lg:text-xl text-purple-100 mb-8 tracking-normal">Calidad y Variedad en Herramientas y Materiales.</p>
+            <a href="productos.html" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">Ver Productos</a>
+        </div>
+    </section>
+
+    <!-- Productos Destacados -->
+    <section class="py-12 lg:py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl lg:text-3xl font-bold text-center text-gray-900 mb-8 lg:mb-12 tracking-tight">Productos Destacados</h2>
+            <div id="destacados" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Aquí se insertan los productos destacados con JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+    
+    <script src="js/include-partials.js"></script>
+    <script src="\js\main.js" defer></script> 
+</body>
+</html>
