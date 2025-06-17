@@ -37,7 +37,7 @@ public class WebpayController {
         // MUY IMPORTANTE: returnUrl debe ser una URL ACCESIBLE por Transbank desde el exterior.
         // Si estás desarrollando localmente, usa ngrok o similar para exponer tu localhost.
         // Para producción, será la URL pública de tu frontend o un endpoint de tu backend.
-        String returnUrl = "http://localhost:8080/api/webpay/commit"; // Cambia esto por tu URL real
+        String returnUrl = "http://localhost:8081/api/webpay/commit"; // Cambia esto por tu URL real
 
         try {
             Map<String, String> response = webpayService.createTransaction(requestDto.getAmount(), buyOrder, sessionId, returnUrl);
