@@ -40,32 +40,67 @@ public class BancoCentralService {
         // Series específicas de tipos de cambio del Banco Central de Chile
         Map<String, String> seriesTiposCambio = new LinkedHashMap<>();
         
-        // Moneda principal
+        // Series de tipos de cambio CLP a otras monedas
+        seriesTiposCambio.put("F072.CLP.SAR.N.O.D", "Riyal saudí");
+        seriesTiposCambio.put("F072.CLP.ARS.N.O.D", "Peso argentino");
+        seriesTiposCambio.put("F072.CLP.AUD.N.O.D", "Dólar australiano");
+        seriesTiposCambio.put("F072.CLP.BSP.N.O.D", "Peso filipino");
+        seriesTiposCambio.put("F072.CLP.BMD.N.O.D", "Dólar bermudeño");
+        seriesTiposCambio.put("F072.CLP.BOL.N.O.D", "Boliviano boliviano");
+        seriesTiposCambio.put("F072.CLP.BRL.N.O.D", "Real brasileño");
+        seriesTiposCambio.put("F072.CLP.CAD.N.O.D", "Dólar canadiense");
+        seriesTiposCambio.put("F072.CLP.QAR.N.O.D", "Riyal catarí");
+        seriesTiposCambio.put("F072.CLP.CNY.N.O.D", "Yuan chino");
+        seriesTiposCambio.put("F072.CLP.COP.N.O.D", "Peso colombiano");
+        seriesTiposCambio.put("F072.CLP.KRW.N.O.D", "Won surcoreano");
+        seriesTiposCambio.put("F072.CLP.CRC.N.O.D", "Colón costarricense");
+        seriesTiposCambio.put("F072.CLP.CUP.N.O.D", "Peso cubano");
+        seriesTiposCambio.put("F072.CLP.DEG.N.O.D", "Deg");
+        seriesTiposCambio.put("F072.CLP.DKK.N.O.D", "Corona danesa");
+        seriesTiposCambio.put("F072.CLP.EGP.N.O.D", "Libra egipcia");
+        seriesTiposCambio.put("F072.CLP.AED.N.O.D", "Dirham de EAU");
         seriesTiposCambio.put("F073.TCO.PRE.Z.D", "Dólar observado");
-        
-        // Unidad de Fomento
-        seriesTiposCambio.put("F073.UF.CLP.D", "Unidad de Fomento (UF)");
-        
-        // Principales monedas internacionales (paridades con USD)
-        seriesTiposCambio.put("F072.EUR.USD.N.O.D", "Euro");
-        seriesTiposCambio.put("F072.GBP.USD.N.O.D", "Libra esterlina");
-        seriesTiposCambio.put("F072.JPY.USD.N.O.D", "Yen japonés");
-        seriesTiposCambio.put("F072.CAD.USD.N.O.D", "Dólar canadiense");
-        seriesTiposCambio.put("F072.AUD.USD.N.O.D", "Dólar australiano");
-        seriesTiposCambio.put("F072.CHF.USD.N.O.D", "Franco suizo");
-        
-        // Monedas latinoamericanas
-        seriesTiposCambio.put("F072.ARS.USD.N.O.D", "Peso argentino");
-        seriesTiposCambio.put("F072.BRL.USD.N.O.D", "Real brasileño");
-        seriesTiposCambio.put("F072.COP.USD.N.O.D", "Peso colombiano");
-        seriesTiposCambio.put("F072.PEN.USD.N.O.D", "Sol peruano");
-        seriesTiposCambio.put("F072.MXN.USD.N.O.D", "Peso mexicano");
-        seriesTiposCambio.put("F072.UYU.USD.N.O.D", "Peso uruguayo");
-        
-        // Otras monedas importantes
-        seriesTiposCambio.put("F072.CNY.USD.N.O.D", "Yuan chino");
-        seriesTiposCambio.put("F072.KRW.USD.N.O.D", "Won surcoreano");
-        seriesTiposCambio.put("F072.INR.USD.N.O.D", "Rupia india");
+        seriesTiposCambio.put("F072.CLP.EUR.N.O.D", "Euro");
+        seriesTiposCambio.put("F072.CLP.PHP.N.O.D", "Peso filipino");
+        seriesTiposCambio.put("F072.CLP.FJD.N.O.D", "Dólar fiyiano");
+        seriesTiposCambio.put("F072.CLP.XPF.N.O.D", "Franco CFP");
+        seriesTiposCambio.put("F072.CLP.GTQ.N.O.D", "Quetzal guatemalteco");
+        seriesTiposCambio.put("F072.CLP.HKD.N.O.D", "Dólar de Hong Kong");
+        seriesTiposCambio.put("F072.CLP.HUF.N.O.D", "Forinto húngaro");
+        seriesTiposCambio.put("F072.CLP.INR.N.O.D", "Rupia india");
+        seriesTiposCambio.put("F072.CLP.IDR.N.O.D", "Rupia indonesia");
+        seriesTiposCambio.put("F072.CLP.IRR.N.O.D", "Rial iraní");
+        seriesTiposCambio.put("F072.CLP.ISK.N.O.D", "Corona islandesa");
+        seriesTiposCambio.put("F072.CLP.KYD.N.O.D", "Dólar caimán");
+        seriesTiposCambio.put("F072.CLP.ILS.N.O.D", "Nuevo shéquel israelí");
+        seriesTiposCambio.put("F072.CLP.JPY.N.O.D", "Yen japonés");
+        seriesTiposCambio.put("F072.CLP.KZT.N.O.D", "Tenge kazajo");
+        seriesTiposCambio.put("F072.CLP.MYR.N.O.D", "Ringgit malayo");
+        seriesTiposCambio.put("F072.CLP.MAD.N.O.D", "Dirham marroquí");
+        seriesTiposCambio.put("F072.CLP.MXN.N.O.D", "Peso mexicano");
+        seriesTiposCambio.put("F072.CLP.NOK.N.O.D", "Corona noruega");
+        seriesTiposCambio.put("F072.CLP.NZD.N.O.D", "Dólar neozelandés");
+        seriesTiposCambio.put("F072.CLP.PKR.N.O.D", "Rupia pakistaní");
+        seriesTiposCambio.put("F072.CLP.PAB.N.O.D", "Balboa panameño");
+        seriesTiposCambio.put("F072.CLP.PYG.N.O.D", "Guaraní paraguayo");
+        seriesTiposCambio.put("F072.CLP.PEN.N.O.D", "Sol peruano");
+        seriesTiposCambio.put("F072.CLP.PLN.N.O.D", "Zloty polaco");
+        seriesTiposCambio.put("F072.CLP.GBP.N.O.D", "Libra esterlina");
+        seriesTiposCambio.put("F072.CLP.CZK.N.O.D", "Corona checa");
+        seriesTiposCambio.put("F072.CLP.DOP.N.O.D", "Peso dominicano");
+        seriesTiposCambio.put("F072.CLP.RON.N.O.D", "Leu rumano");
+        seriesTiposCambio.put("F072.CLP.RUR.N.O.D", "Rublo ruso");
+        seriesTiposCambio.put("F072.CLP.SGD.N.O.D", "Dólar singapurense");
+        seriesTiposCambio.put("F072.CLP.ZAR.N.O.D", "Rand sudafricano");
+        seriesTiposCambio.put("F072.CLP.SEK.N.O.D", "Corona sueca");
+        seriesTiposCambio.put("F072.CLP.CHF.N.O.D", "Franco suizo");
+        seriesTiposCambio.put("F072.CLP.THB.N.O.D", "Baht tailandés");
+        seriesTiposCambio.put("F072.CLP.TWD.N.O.D", "Nuevo dólar taiwanés");
+        seriesTiposCambio.put("F072.CLP.TRY.N.O.D", "Lira turca");
+        seriesTiposCambio.put("F072.CLP.UAH.N.O.D", "Grivna ucraniana");
+        seriesTiposCambio.put("F072.CLP.UYU.N.O.D", "Peso uruguayo");
+        seriesTiposCambio.put("F072.CLP.VEB.N.O.D", "Bolívar venezolano");
+        seriesTiposCambio.put("F072.CLP.VND.N.O.D", "Dong vietnamita");
         
         RestTemplate restTemplate = new RestTemplate();
         
