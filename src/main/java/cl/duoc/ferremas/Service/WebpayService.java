@@ -34,8 +34,8 @@ public class WebpayService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Tbk-Api-Key-Id", webpayConfig.getApiKeyId());
-        headers.set("Tbk-Api-Key-Secret", webpayConfig.getApiKeySecret());
+        headers.set("Tbk-Api-Key-Id", "597055555532");
+        headers.set("Tbk-Api-Key-Secret", "579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C");
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("buy_order", buyOrder);
@@ -46,12 +46,20 @@ public class WebpayService {
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
         try {
-            // Realiza la llamada HTTP POST a Transbank
             ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, Map.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                // Transbank devuelve un token y una url para redirigir al usuario
-                return response.getBody();
+                Map<String, String> result = new HashMap<>();
+                Map<String, Object> responseBody = response.getBody();
+                
+                String token = (String) responseBody.get("token");
+                String webpayUrl = (String) responseBody.get("url");
+                
+                result.put("token", token);
+                result.put("url", webpayUrl);
+                // Agregar URL completa con el token
+                result.put("fullUrl", webpayUrl + "?token_ws=" + token);
+                return result;
             } else {
                 // Manejo de errores si la API de Transbank devuelve un código de estado no exitoso
                 System.err.println("Error al crear transacción Webpay: " + response.getStatusCode() + " - " + response.getBody());

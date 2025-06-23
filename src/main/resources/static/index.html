@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FerreMas | Tu Ferretería de Confianza</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="icon" href="https://placehold.co/32x32/7C3AED/FFFFFF?text=F" type="image/png" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 leading-relaxed">
+
+  <!-- HEADER -->
+  <div id="header"></div>
+
+  <!-- HERO -->
+  <section class="relative bg-purple-700 text-white py-24 px-4 lg:px-16 overflow-hidden rounded-b-3xl shadow-lg">
+    <div class="max-w-6xl mx-auto text-center">
+      <h1 class="text-4xl lg:text-6xl font-extrabold mb-6 drop-shadow-lg">
+        ¡Todo para tu proyecto en un solo lugar!
+      </h1>
+      <p class="text-lg lg:text-xl mb-10 text-purple-100">
+        Calidad, confianza y una gran variedad de herramientas y materiales en <strong>FerreMas</strong>.
+      </p>
+      <a href="productos.html"
+        class="inline-block bg-white text-purple-700 hover:bg-purple-100 font-semibold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
+        Ver Productos
+      </a>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-purple-700 to-transparent pointer-events-none"></div>
+  </section>
+
+  <!-- PRODUCTOS DESTACADOS -->
+  <section class="py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Productos Destacados</h2>
+      <div id="destacados" class="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <!-- Aquí JS insertará productos -->
+      </div>
+    </div>
+  </section>
+
+  <!-- LLAMADO A LA ACCIÓN -->
+  <section class="py-16 bg-gray-100">
+    <div class="max-w-4xl mx-auto text-center px-4">
+      <h3 class="text-2xl font-semibold text-gray-800 mb-4">¿Eres constructor o maestro ferretero?</h3>
+      <p class="text-gray-600 mb-6">Regístrate en FerreMas para recibir descuentos especiales, ofertas y productos personalizados para tus proyectos.</p>
+      <a href="registro.html" class="bg-purple-600 hover:bg-purple-800 text-white px-6 py-3 rounded-full font-medium transition">
+        Crear Cuenta
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div id="footer"></div>
+
+  <!-- SCRIPTS -->
+  <script src="js/include-partials.js"></script>
+  <script src="js/main.js" defer></script>
+</body>
+</html>
