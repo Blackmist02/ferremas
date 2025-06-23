@@ -23,5 +23,6 @@ public class Usuario {
     private String apellido;
     private String run;
     private String correo;
+    private String password;
     private String rol;
 }

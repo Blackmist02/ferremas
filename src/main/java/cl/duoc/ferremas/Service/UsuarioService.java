@@ -1,4 +1,3 @@
-
 package cl.duoc.ferremas.Service;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,4 +39,22 @@ public class UsuarioService {
         usuarioRepository.deleteById(id);
     }
 
+    // Método para buscar usuario por correo
+    public Usuario findByCorreo(String correo) {
+        return usuarioRepository.findByCorreo(correo);
+    }
+
+    // Método para autenticar usuario
+    public Usuario autenticar(String correo, String password) {
+        Usuario usuario = findByCorreo(correo);
+        if (usuario != null && usuario.getPassword().equals(password)) {
+            return usuario;
+        }
+        return null;
+    }
+
+    // Método para verificar si existe un correo
+    public boolean existeCorreo(String correo) {
+        return usuarioRepository.findByCorreo(correo) != null;
+    }
 }

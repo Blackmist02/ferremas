@@ -33,141 +33,35 @@ public class BancoCentralService {
         private Double valor;
     }
 
-    public List<DivisaDTO> obtenerUltimosValoresDivisas() {
-    List<DivisaDTO> resultado = new ArrayList<>();
-    
-    try {
-        // Series específicas de tipos de cambio del Banco Central de Chile
-        Map<String, String> seriesTiposCambio = new LinkedHashMap<>();
+    // Solo este método que realmente usas
+    public List<DivisaDTO> obtenerDivisasPrincipales() {
+        List<DivisaDTO> resultado = new ArrayList<>();
         
-        // Series de tipos de cambio CLP a otras monedas
-        seriesTiposCambio.put("F072.CLP.SAR.N.O.D", "Riyal saudí");
-        seriesTiposCambio.put("F072.CLP.ARS.N.O.D", "Peso argentino");
-        seriesTiposCambio.put("F072.CLP.AUD.N.O.D", "Dólar australiano");
-        seriesTiposCambio.put("F072.CLP.BSP.N.O.D", "Peso filipino");
-        seriesTiposCambio.put("F072.CLP.BMD.N.O.D", "Dólar bermudeño");
-        seriesTiposCambio.put("F072.CLP.BOL.N.O.D", "Boliviano boliviano");
-        seriesTiposCambio.put("F072.CLP.BRL.N.O.D", "Real brasileño");
-        seriesTiposCambio.put("F072.CLP.CAD.N.O.D", "Dólar canadiense");
-        seriesTiposCambio.put("F072.CLP.QAR.N.O.D", "Riyal catarí");
-        seriesTiposCambio.put("F072.CLP.CNY.N.O.D", "Yuan chino");
-        seriesTiposCambio.put("F072.CLP.COP.N.O.D", "Peso colombiano");
-        seriesTiposCambio.put("F072.CLP.KRW.N.O.D", "Won surcoreano");
-        seriesTiposCambio.put("F072.CLP.CRC.N.O.D", "Colón costarricense");
-        seriesTiposCambio.put("F072.CLP.CUP.N.O.D", "Peso cubano");
-        seriesTiposCambio.put("F072.CLP.DEG.N.O.D", "Deg");
-        seriesTiposCambio.put("F072.CLP.DKK.N.O.D", "Corona danesa");
-        seriesTiposCambio.put("F072.CLP.EGP.N.O.D", "Libra egipcia");
-        seriesTiposCambio.put("F072.CLP.AED.N.O.D", "Dirham de EAU");
-        seriesTiposCambio.put("F073.TCO.PRE.Z.D", "Dólar observado");
-        seriesTiposCambio.put("F072.CLP.EUR.N.O.D", "Euro");
-        seriesTiposCambio.put("F072.CLP.PHP.N.O.D", "Peso filipino");
-        seriesTiposCambio.put("F072.CLP.FJD.N.O.D", "Dólar fiyiano");
-        seriesTiposCambio.put("F072.CLP.XPF.N.O.D", "Franco CFP");
-        seriesTiposCambio.put("F072.CLP.GTQ.N.O.D", "Quetzal guatemalteco");
-        seriesTiposCambio.put("F072.CLP.HKD.N.O.D", "Dólar de Hong Kong");
-        seriesTiposCambio.put("F072.CLP.HUF.N.O.D", "Forinto húngaro");
-        seriesTiposCambio.put("F072.CLP.INR.N.O.D", "Rupia india");
-        seriesTiposCambio.put("F072.CLP.IDR.N.O.D", "Rupia indonesia");
-        seriesTiposCambio.put("F072.CLP.IRR.N.O.D", "Rial iraní");
-        seriesTiposCambio.put("F072.CLP.ISK.N.O.D", "Corona islandesa");
-        seriesTiposCambio.put("F072.CLP.KYD.N.O.D", "Dólar caimán");
-        seriesTiposCambio.put("F072.CLP.ILS.N.O.D", "Nuevo shéquel israelí");
-        seriesTiposCambio.put("F072.CLP.JPY.N.O.D", "Yen japonés");
-        seriesTiposCambio.put("F072.CLP.KZT.N.O.D", "Tenge kazajo");
-        seriesTiposCambio.put("F072.CLP.MYR.N.O.D", "Ringgit malayo");
-        seriesTiposCambio.put("F072.CLP.MAD.N.O.D", "Dirham marroquí");
-        seriesTiposCambio.put("F072.CLP.MXN.N.O.D", "Peso mexicano");
-        seriesTiposCambio.put("F072.CLP.NOK.N.O.D", "Corona noruega");
-        seriesTiposCambio.put("F072.CLP.NZD.N.O.D", "Dólar neozelandés");
-        seriesTiposCambio.put("F072.CLP.PKR.N.O.D", "Rupia pakistaní");
-        seriesTiposCambio.put("F072.CLP.PAB.N.O.D", "Balboa panameño");
-        seriesTiposCambio.put("F072.CLP.PYG.N.O.D", "Guaraní paraguayo");
-        seriesTiposCambio.put("F072.CLP.PEN.N.O.D", "Sol peruano");
-        seriesTiposCambio.put("F072.CLP.PLN.N.O.D", "Zloty polaco");
-        seriesTiposCambio.put("F072.CLP.GBP.N.O.D", "Libra esterlina");
-        seriesTiposCambio.put("F072.CLP.CZK.N.O.D", "Corona checa");
-        seriesTiposCambio.put("F072.CLP.DOP.N.O.D", "Peso dominicano");
-        seriesTiposCambio.put("F072.CLP.RON.N.O.D", "Leu rumano");
-        seriesTiposCambio.put("F072.CLP.RUR.N.O.D", "Rublo ruso");
-        seriesTiposCambio.put("F072.CLP.SGD.N.O.D", "Dólar singapurense");
-        seriesTiposCambio.put("F072.CLP.ZAR.N.O.D", "Rand sudafricano");
-        seriesTiposCambio.put("F072.CLP.SEK.N.O.D", "Corona sueca");
-        seriesTiposCambio.put("F072.CLP.CHF.N.O.D", "Franco suizo");
-        seriesTiposCambio.put("F072.CLP.THB.N.O.D", "Baht tailandés");
-        seriesTiposCambio.put("F072.CLP.TWD.N.O.D", "Nuevo dólar taiwanés");
-        seriesTiposCambio.put("F072.CLP.TRY.N.O.D", "Lira turca");
-        seriesTiposCambio.put("F072.CLP.UAH.N.O.D", "Grivna ucraniana");
-        seriesTiposCambio.put("F072.CLP.UYU.N.O.D", "Peso uruguayo");
-        seriesTiposCambio.put("F072.CLP.VEB.N.O.D", "Bolívar venezolano");
-        seriesTiposCambio.put("F072.CLP.VND.N.O.D", "Dong vietnamita");
-        
-        RestTemplate restTemplate = new RestTemplate();
-        
-        // Usar un rango más amplio de fechas (últimos 60 días)
-        String fechaHoy = LocalDate.now().toString();
-        String fechaInicio = LocalDate.now().minusDays(60).toString();
-        
-        System.out.println("Obteniendo tipos de cambio desde: " + fechaInicio + " hasta: " + fechaHoy);
-        System.out.println("Procesando " + seriesTiposCambio.size() + " series de divisas...");
-        
-        // Procesar cada serie de tipo de cambio
-        int contador = 0;
-        for (Map.Entry<String, String> entry : seriesTiposCambio.entrySet()) {
-            contador++;
-            System.out.println("--- Procesando " + contador + "/" + seriesTiposCambio.size() + " ---");
-            procesarSerieTipoCambio(entry.getKey(), entry.getValue(), fechaInicio, fechaHoy, resultado, restTemplate);
+        try {
+            // Solo USD y EUR que usas en el carrito
+            Map<String, String> seriesPrincipales = new LinkedHashMap<>();
+            seriesPrincipales.put("F073.TCO.PRE.Z.D", "Dólar estadounidense (USD)");
+            seriesPrincipales.put("F072.CLP.EUR.N.O.D", "Euro (EUR)");
             
-            // Pequeña pausa para no sobrecargar la API (100ms entre consultas)
-            Thread.sleep(100);
+            RestTemplate restTemplate = new RestTemplate();
+            String fechaHoy = LocalDate.now().toString();
+            String fechaInicio = LocalDate.now().minusDays(30).toString();
+            
+            System.out.println("Obteniendo divisas para el carrito: USD y EUR");
+            
+            for (Map.Entry<String, String> entry : seriesPrincipales.entrySet()) {
+                procesarSerieTipoCambio(entry.getKey(), entry.getValue(), fechaInicio, fechaHoy, resultado, restTemplate);
+                Thread.sleep(150); // Pausa para no sobrecargar la API
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error al obtener divisas principales: " + e.getMessage());
         }
-        
-        System.out.println("=== RESUMEN ===");
-        System.out.println("Total de divisas obtenidas: " + resultado.size());
-        for (DivisaDTO divisa : resultado) {
-            System.out.println("- " + divisa.getNombre() + ": $" + String.format("%.4f", divisa.getValor()));
-        }
-        
-    } catch (Exception e) {
-        System.err.println("Error al obtener datos del Banco Central: " + e.getMessage());
-        e.printStackTrace();
+
+        return resultado;
     }
 
-    return resultado;
-}
-
-// Método para obtener solo las divisas más importantes (más rápido)
-public List<DivisaDTO> obtenerDivisasPrincipales() {
-    List<DivisaDTO> resultado = new ArrayList<>();
-    
-    try {
-        // Solo las 5 divisas más importantes
-        Map<String, String> seriesPrincipales = new LinkedHashMap<>();
-        seriesPrincipales.put("F073.TCO.PRE.Z.D", "Dólar observado");
-        seriesPrincipales.put("F073.UF.CLP.D", "Unidad de Fomento (UF)");
-        seriesPrincipales.put("F072.EUR.USD.N.O.D", "Euro");
-        seriesPrincipales.put("F072.GBP.USD.N.O.D", "Libra esterlina");
-        seriesPrincipales.put("F072.BRL.USD.N.O.D", "Real brasileño");
-        
-        RestTemplate restTemplate = new RestTemplate();
-        String fechaHoy = LocalDate.now().toString();
-        String fechaInicio = LocalDate.now().minusDays(30).toString();
-        
-        System.out.println("Obteniendo divisas principales...");
-        
-        for (Map.Entry<String, String> entry : seriesPrincipales.entrySet()) {
-            procesarSerieTipoCambio(entry.getKey(), entry.getValue(), fechaInicio, fechaHoy, resultado, restTemplate);
-            Thread.sleep(50); // Pausa más corta
-        }
-        
-    } catch (Exception e) {
-        System.err.println("Error al obtener divisas principales: " + e.getMessage());
-    }
-
-    return resultado;
-}
-
-private void procesarSerieTipoCambio(String seriesId, String nombre, String fechaInicio, String fechaHoy, List<DivisaDTO> resultado, RestTemplate restTemplate) {
+    private void procesarSerieTipoCambio(String seriesId, String nombre, String fechaInicio, String fechaHoy, List<DivisaDTO> resultado, RestTemplate restTemplate) {
     try {
         String getUrl = String.format(
                 "%s?user=%s&pass=%s&function=GetSeries&timeseries=%s&firstdate=%s&lastdate=%s",
