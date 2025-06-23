@@ -13,18 +13,32 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF para APIs REST
             .authorizeHttpRequests(authz -> authz
-                // Permitir todos los archivos estáticos
-                .requestMatchers("/", "/index.html", "/productos.html", "/carrito.html", 
-                                "/login.html", "/registro.html", "/productoInd.html", "/divisas.html",
-                                "/webpay-success.html", "/webpay-failure.html").permitAll()
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/partials/**", "/webpay/**").permitAll()
-                .requestMatchers("/api/**").permitAll()
+                // Permitir acceso público a recursos estáticos
+                .requestMatchers("/", "/index.html", "/login.html", "/registro.html").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/partials/**").permitAll()
+                .requestMatchers("/productos.html", "/productoInd.html", "/carrito.html").permitAll()
+                .requestMatchers("/webpay-success.html", "/webpay-failure.html").permitAll()
+                
+                // Permitir acceso público a APIs específicas
+                .requestMatchers("/api/usuarios/registro", "/api/usuarios/login").permitAll()
+                .requestMatchers("/api/productos/**").permitAll()
+                .requestMatchers("/api/divisas/**").permitAll()
+                .requestMatchers("/api/webpay/**").permitAll()
+                
+                // APIs administrativas requieren autenticación
+                .requestMatchers("/api/usuarios/usuario", "/api/usuarios/usuarios").authenticated()
+                .requestMatchers("/api/suc/**").authenticated()
+                .requestMatchers("/api/boleta/**").authenticated()
+                
+                // Cualquier otra petición requiere autenticación
                 .anyRequest().authenticated()
             )
-            .csrf(csrf -> csrf.disable())
-            .headers(headers -> headers.frameOptions().disable());
-        
+            .httpBasic(httpBasic -> {
+                // Configuración de autenticación básica solo para endpoints admin
+            });
+
         return http.build();
     }
 }
