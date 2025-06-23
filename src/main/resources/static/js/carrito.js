@@ -53,6 +53,11 @@ function mostrarCarrito() {
                     </tbody>
                 </table>
                 <div class="text-right mt-4 font-bold text-lg">Total: $${total}</div>
+                <div class="text-right mt-4">
+                    <button onclick="procesarCompra(${total})" class="bg-green-600 hover:bg-green-800 text-white px-6 py-3 rounded-lg font-semibold transition">
+                        Comprar con Webpay
+                    </button>
+                </div>
             `;
         });
 }
@@ -63,4 +68,46 @@ function eliminarDelCarrito(id) {
     localStorage.setItem('carrito', JSON.stringify(carrito));
     mostrarCarrito();
     if (window.actualizarContadorCarrito) window.actualizarContadorCarrito();
+}
+
+async function procesarCompra(total) {
+    if (total <= 0) {
+        alert('El carrito está vacío o no tiene productos válidos.');
+        return;
+    }
+
+    try {
+        // Crear transacción Webpay
+        const response = await fetch('/api/webpay/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                amount: total
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al crear la transacción');
+        }
+
+        const data = await response.json();
+        
+        if (data.error) {
+            alert('Error: ' + data.error);
+            return;
+        }
+
+        // Redirigir a Webpay
+        if (data.url && data.token) {
+            window.location.href = data.url + '?token_ws=' + data.token;
+        } else {
+            alert('Error: No se pudo obtener la URL de pago');
+        }
+
+    } catch (error) {
+        console.error('Error al procesar la compra:', error);
+        alert('Error al procesar la compra. Por favor, inténtalo de nuevo.');
+    }
 }

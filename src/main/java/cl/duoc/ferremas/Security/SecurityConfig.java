@@ -16,7 +16,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Permitir todos los archivos estáticos
                 .requestMatchers("/", "/index.html", "/productos.html", "/carrito.html", 
-                                "/login.html", "/registro.html", "/productoInd.html", "/divisas.html").permitAll()
+                                "/login.html", "/registro.html", "/productoInd.html", "/divisas.html",
+                                "/webpay-success.html", "/webpay-failure.html").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/partials/**", "/webpay/**").permitAll()
                 .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
