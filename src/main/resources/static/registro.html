@@ -47,7 +47,7 @@
   </div>
 
   <script>
-    document.getElementById('registroForm').addEventListener('submit', function(e) {
+    document.getElementById('registroForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const nombre = document.getElementById('nombre').value.trim();
@@ -60,19 +60,32 @@
         return;
       }
 
-      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      try {
+        const response = await fetch('/api/usuarios/registro', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            nombre: nombre,
+            email: email,
+            password: password
+          })
+        });
 
-      if (usuarios.some(u => u.email === email)) {
-        alert("Este correo ya está registrado.");
-        return;
+        const data = await response.json();
+
+        if (data.success) {
+          alert("Cuenta creada exitosamente. Ahora puedes iniciar sesión.");
+          window.location.href = "login.html";
+        } else {
+          alert(data.message);
+        }
+
+      } catch (error) {
+        console.error('Error al registrar:', error);
+        alert("Error al crear la cuenta. Por favor, inténtalo de nuevo.");
       }
-
-      const nuevoUsuario = { nombre, email, password };
-      usuarios.push(nuevoUsuario);
-      localStorage.setItem('usuarios', JSON.stringify(usuarios));
-
-      alert("Cuenta creada exitosamente. Ahora puedes iniciar sesión.");
-      window.location.href = "login.html";
     });
   </script>
 </body>

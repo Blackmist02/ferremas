@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const yearSpan = document.getElementById('currentYear');
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
     
+    // Verificar si hay usuario logueado usando SessionManager
+    const usuario = SessionManager ? SessionManager.obtenerUsuarioActivo() : null;
+    if (usuario) {
+        console.log('Usuario logueado:', usuario.nombre);
+    }
+    
     await cargarTasasDivisas();
     mostrarCarrito();
 });
