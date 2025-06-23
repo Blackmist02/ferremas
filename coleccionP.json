@@ -3,7 +3,7 @@
         "name": "Ferremas API - Colección Completa",
         "description": "Colección completa de pruebas para todas las APIs de Ferremas - Actualizada 2025",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-        "version": "2.0.0"
+        "version": "2.1.0"
     },
     "variable": [
         {
@@ -59,7 +59,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"nombre\": \"Juan Carlos\",\n    \"apellido\": \"Perez Rodriguez\",\n    \"run\": \"12345678-9\",\n    \"correo\": \"juan.perez@ferremas.cl\",\n    \"rol\": \"ADMIN\"\n}"
+                            "raw": "{\n    \"nombre\": \"Juan Carlos\",\n    \"apellido\": \"Perez Rodriguez\",\n    \"run\": \"12345678-9\",\n    \"correo\": \"juan.perez@ferremas.cl\",\n    \"password\": \"123456\",\n    \"rol\": \"ADMIN\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/api/usuarios/usuario",
@@ -83,7 +83,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "[\n    {\n        \"nombre\": \"Juan Carlos\",\n        \"apellido\": \"Perez Rodriguez\",\n        \"run\": \"12345678-9\",\n        \"correo\": \"juan.perez@ferremas.cl\",\n        \"rol\": \"ADMIN\"\n    },\n    {\n        \"nombre\": \"Maria Elena\",\n        \"apellido\": \"Lopez Gonzalez\",\n        \"run\": \"98765432-1\",\n        \"correo\": \"maria.lopez@ferremas.cl\",\n        \"rol\": \"USER\"\n    },\n    {\n        \"nombre\": \"Carlos\",\n        \"apellido\": \"Martinez Silva\",\n        \"run\": \"11223344-5\",\n        \"correo\": \"carlos.martinez@ferremas.cl\",\n        \"rol\": \"VENDEDOR\"\n    }\n]"
+                            "raw": "[\n    {\n        \"nombre\": \"Juan Carlos\",\n        \"apellido\": \"Perez Rodriguez\",\n        \"run\": \"12345678-9\",\n        \"correo\": \"juan.perez@ferremas.cl\",\n        \"password\": \"123456\",\n        \"rol\": \"ADMIN\"\n    },\n    {\n        \"nombre\": \"Maria Elena\",\n        \"apellido\": \"Lopez Gonzalez\",\n        \"run\": \"98765432-1\",\n        \"correo\": \"maria.lopez@ferremas.cl\",\n        \"password\": \"123456\",\n        \"rol\": \"USER\"\n    },\n    {\n        \"nombre\": \"Carlos\",\n        \"apellido\": \"Martinez Silva\",\n        \"run\": \"11223344-5\",\n        \"correo\": \"carlos.martinez@ferremas.cl\",\n        \"password\": \"123456\",\n        \"rol\": \"VENDEDOR\"\n    }\n]"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/api/usuarios/usuarios",
@@ -93,6 +93,54 @@
                             "path": ["api", "usuarios", "usuarios"]
                         },
                         "description": "Crea múltiples usuarios de forma masiva"
+                    }
+                },
+                {
+                    "name": "🆕 Registro de Usuario",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nombre\": \"Ana García\",\n    \"email\": \"ana.garcia@email.com\",\n    \"password\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios/registro",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "usuarios", "registro"]
+                        },
+                        "description": "Registra un nuevo usuario desde el frontend"
+                    }
+                },
+                {
+                    "name": "🔐 Login de Usuario",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"ana.garcia@email.com\",\n    \"password\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios/login",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "usuarios", "login"]
+                        },
+                        "description": "Autentica un usuario y devuelve sus datos"
                     }
                 }
             ]
@@ -296,7 +344,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"codigoProducto\": \"FER-HM001\",\n    \"marca\": \"Stanley\",\n    \"codigo\": \"HM001\",\n    \"nombre\": \"Martillo de Carpintero 16oz\",\n    \"modelo\": \"ProCarpenter-16\",\n    \"stock\": 50,\n    \"precios\": [\n        {\n            \"fecha\": \"2025-06-23\",\n            \"valor\": 18500\n        }\n    ]\n}"
+                            "raw": "{\n    \"codigoProducto\": \"FER-HM001\",\n    \"marca\": \"Stanley\",\n    \"codigo\": \"HM001\",\n    \"nombre\": \"Martillo de Carpintero 16oz\",\n    \"modelo\": \"ProCarpenter-16\",\n    \"stock\": 50,\n    \"precios\": [\n        {\n            \"fecha\": \"2025-01-15\",\n            \"valor\": 18500\n        }\n    ]\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/api/productos/producto",
@@ -320,7 +368,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "[\n    {\n        \"codigoProducto\": \"FER-HM001\",\n        \"marca\": \"Stanley\",\n        \"codigo\": \"HM001\",\n        \"nombre\": \"Martillo de Carpintero 16oz\",\n        \"modelo\": \"ProCarpenter-16\",\n        \"stock\": 50,\n        \"precios\": [\n            {\n                \"fecha\": \"2025-06-23\",\n                \"valor\": 18500\n            }\n        ]\n    },\n    {\n        \"codigoProducto\": \"FER-HM002\",\n        \"marca\": \"Stanley\",\n        \"codigo\": \"HM002\",\n        \"nombre\": \"Martillo de Bola 20oz\",\n        \"modelo\": \"BallPeen-20\",\n        \"stock\": 30,\n        \"precios\": [\n            {\n                \"fecha\": \"2025-06-23\",\n                \"valor\": 22000\n            }\n        ]\n    },\n    {\n        \"codigoProducto\": \"FER-TD001\",\n        \"marca\": \"DeWalt\",\n        \"codigo\": \"TD001\",\n        \"nombre\": \"Taladro Inalámbrico 18V\",\n        \"modelo\": \"DCD771C2\",\n        \"stock\": 15,\n        \"precios\": [\n            {\n                \"fecha\": \"2025-06-23\",\n                \"valor\": 89900\n            }\n        ]\n    }\n]"
+                            "raw": "[\n    {\n        \"codigoProducto\": \"FER-HM001\",\n        \"marca\": \"Stanley\",\n        \"codigo\": \"HM001\",\n        \"nombre\": \"Martillo de Carpintero 16oz\",\n        \"modelo\": \"ProCarpenter-16\",\n        \"stock\": 50,\n        \"precios\": [\n            {\n                \"fecha\": \"2025-01-15\",\n                \"valor\": 18500\n            }\n        ]\n    },\n    {\n        \"codigoProducto\": \"FER-HM002\",\n        \"marca\": \"Stanley\",\n        \"codigo\": \"HM002\",\n        \"nombre\": \"Martillo de Bola 20oz\",\n        \"modelo\": \"BallPeen-20\",\n        \"stock\": 30,\n        \"precios\": [\n            {\n                \"fecha\": \"2025-01-15\",\n                \"valor\": 22000\n            }\n        ]\n    },\n    {\n        \"codigoProducto\": \"FER-TD001\",\n        \"marca\": \"DeWalt\",\n        \"codigo\": \"TD001\",\n        \"nombre\": \"Taladro Inalámbrico 18V\",\n        \"modelo\": \"DCD771C2\",\n        \"stock\": 15,\n        \"precios\": [\n            {\n                \"fecha\": \"2025-01-15\",\n                \"valor\": 89900\n            }\n        ]\n    }\n]"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/api/productos/productos",
@@ -344,7 +392,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "[\n    {\n        \"fecha\": \"2025-07-01\",\n        \"valor\": 19000\n    },\n    {\n        \"fecha\": \"2025-08-01\",\n        \"valor\": 19500\n    }\n]"
+                            "raw": "[\n    {\n        \"fecha\": \"2025-01-20\",\n        \"valor\": 19000\n    },\n    {\n        \"fecha\": \"2025-01-25\",\n        \"valor\": 19500\n    }\n]"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/api/productos/producto/1/precios",
@@ -415,18 +463,18 @@
             "description": "Consulta de tipos de cambio del Banco Central",
             "item": [
                 {
-                    "name": "Obtener Últimas Divisas",
+                    "name": "🆕 Obtener Tasas de Cambio",
                     "request": {
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/api/divisas/ultimas",
+                            "raw": "{{baseUrl}}/api/divisas/tasas",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
-                            "path": ["api", "divisas", "ultimas"]
+                            "path": ["api", "divisas", "tasas"]
                         },
-                        "description": "Obtiene los últimos valores de todas las divisas"
+                        "description": "Obtiene las tasas de cambio optimizadas para el carrito (CLP, USD, EUR)"
                     }
                 },
                 {
@@ -441,67 +489,7 @@
                             "port": "8081",
                             "path": ["api", "divisas", "principales"]
                         },
-                        "description": "Obtiene las divisas principales (USD, EUR, UF, etc.)"
-                    }
-                },
-                {
-                    "name": "Obtener UF",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/api/divisas/uf",
-                            "protocol": "http",
-                            "host": ["localhost"],
-                            "port": "8081",
-                            "path": ["api", "divisas", "uf"]
-                        },
-                        "description": "Obtiene el valor actual de la UF"
-                    }
-                },
-                {
-                    "name": "Obtener Euro",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/api/divisas/euro",
-                            "protocol": "http",
-                            "host": ["localhost"],
-                            "port": "8081",
-                            "path": ["api", "divisas", "euro"]
-                        },
-                        "description": "Obtiene el valor actual del Euro"
-                    }
-                },
-                {
-                    "name": "Obtener Yen",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/api/divisas/yen",
-                            "protocol": "http",
-                            "host": ["localhost"],
-                            "port": "8081",
-                            "path": ["api", "divisas", "yen"]
-                        },
-                        "description": "Obtiene el valor actual del Yen japonés"
-                    }
-                },
-                {
-                    "name": "Ver Divisas (HTML)",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/api/divisas/ver",
-                            "protocol": "http",
-                            "host": ["localhost"],
-                            "port": "8081",
-                            "path": ["api", "divisas", "ver"]
-                        },
-                        "description": "Muestra las divisas en formato HTML visual"
+                        "description": "Obtiene las divisas principales (USD, EUR) con detalles completos"
                     }
                 }
             ]
