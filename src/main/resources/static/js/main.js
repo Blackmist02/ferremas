@@ -10,12 +10,18 @@ function cargarProductosDestacados() {
     fetch('/api/productos/producto')
         .then(res => res.json())
         .then(productos => {
-            console.log("funciona");
             const destacados = document.getElementById('destacados');
             if (!destacados) return;
+
             destacados.innerHTML = '';
-            // Mostrar hasta 3 productos destacados
-            productos.slice(0, 3).forEach(producto => {
+
+            // Mostrar hasta 4 productos destacados
+            productos.slice(0, 4).forEach(producto => {
+                let precioReciente = null;
+                if (producto.precios && producto.precios.length > 0) {
+                    precioReciente = producto.precios.reduce((a, b) => (a.fecha > b.fecha ? a : b));
+                }
+
                 destacados.innerHTML += `
                     <div class="bg-gray-50 rounded-lg shadow-lg p-6 flex flex-col items-center">
                         <img src="https://placehold.co/200x150/8B5CF6/FFFFFF?text=${encodeURIComponent(producto.nombre)}" alt="${producto.nombre}" class="mb-4 rounded-md w-full h-32 object-contain">
@@ -24,7 +30,7 @@ function cargarProductosDestacados() {
                         <p class="text-sm text-gray-600 mb-1"><strong>Modelo:</strong> ${producto.modelo}</p>
                         <p class="text-sm text-gray-600 mb-1"><strong>Stock:</strong> ${producto.Stock}</p>
                         <p class="text-purple-700 font-bold text-lg mb-2">
-                            $${producto.precios && producto.precios.length > 0 ? producto.precios[0].valor : 'No disponible'}
+                            $${precioReciente ? precioReciente.valor : 'No disponible'}
                         </p>
                         <a href="productoInd.html?producto=${producto.id}" class="bg-purple-600 hover:bg-purple-800 text-white px-4 py-2 rounded transition">Ver detalle</a>
                     </div>
@@ -36,8 +42,8 @@ function cargarProductosDestacados() {
             if (destacados) destacados.innerHTML = '<p class="text-red-600">No se pudieron cargar los productos.</p>';
             console.error('Error al cargar productos:', err);
         });
-        
 }
+
 
 
 function agregarAlCarrito(productoId) {

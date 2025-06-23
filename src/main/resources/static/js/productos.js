@@ -1,21 +1,61 @@
-document.addEventListener('DOMContentLoaded', () => {
+let productos = [];
+let monedaSeleccionada = 'CLP';
+let tasasDivisas = { CLP: 1 }; // CLP es la base
+
+document.addEventListener('DOMContentLoaded', async () => {
     const yearSpan = document.getElementById('currentYear');
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
+    await cargarTasasDivisas();
+
+    // Manejar cambios de moneda
+    const currencySelector = document.getElementById('currency-selector');
+    if (currencySelector) {
+        currencySelector.addEventListener('change', (e) => {
+            monedaSeleccionada = e.target.value;
+            iniciarPaginacion(productos, 12);
+        });
+    }
+
     fetch('/api/productos/producto')
         .then(res => res.json())
-        .then(productos => {
-            if (!Array.isArray(productos) || productos.length === 0) {
+        .then(data => {
+            if (!Array.isArray(data) || data.length === 0) {
                 document.getElementById('product-list').innerHTML = '<p class="text-red-600">No hay productos disponibles.</p>';
                 return;
             }
+            productos = data;
             iniciarPaginacion(productos, 12);
         })
         .catch(err => {
             document.getElementById('product-list').innerHTML = '<p class="text-red-600">Error al cargar los productos.</p>';
             console.error(err);
         });
+
+    actualizarContadorCarrito();
 });
+
+async function cargarTasasDivisas() {
+    try {
+        const res = await fetch('/api/divisas');
+        const data = await res.json();
+        tasasDivisas = { CLP: 1 }; // aseguramos CLP como base
+        data.forEach(divisa => {
+            if (divisa.codigo && divisa.valor) {
+                tasasDivisas[divisa.codigo] = divisa.valor;
+            }
+        });
+    } catch (e) {
+        console.error('Error cargando divisas:', e);
+        // Fallback en caso de error
+        tasasDivisas = {
+            CLP: 1,
+            USD: 0.0011,
+            EUR: 0.0009,
+            BRL: 0.0053
+        };
+    }
+}
 
 function iniciarPaginacion(productos, porPagina) {
     let paginaActual = 1;
@@ -42,7 +82,7 @@ function iniciarPaginacion(productos, porPagina) {
                     <p class="text-sm text-gray-600 mb-1"><strong>Modelo:</strong> ${producto.modelo}</p>
                     <p class="text-sm text-gray-600 mb-1"><strong>Stock:</strong> ${producto.Stock}</p>
                     <p class="text-purple-700 font-bold text-lg mb-2">
-                        $${precioReciente ? precioReciente.valor : 'No disponible'}
+                        ${precioReciente ? formatearMoneda(precioReciente.valor) : 'No disponible'}
                     </p>
                     <a href="productoInd.html?producto=${producto.id}" class="bg-purple-600 hover:bg-purple-800 text-white px-4 py-2 rounded transition">Ver detalle</a>
                     <button onclick="agregarAlCarrito(${producto.id})" class="bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded transition">Agregar al carrito</button>
@@ -69,7 +109,6 @@ function iniciarPaginacion(productos, porPagina) {
         pag.innerHTML += `<button ${paginaActual === totalPaginas ? 'disabled' : ''} class="px-3 py-1 rounded ${paginaActual === totalPaginas ? 'bg-gray-300 text-gray-500' : 'bg-purple-600 text-white hover:bg-purple-800'}" onclick="window.cambiarPagina(${paginaActual + 1})">Siguiente</button>`;
     }
 
-    // Exponer función global para los botones
     window.cambiarPagina = function(nuevaPagina) {
         if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
             mostrarPagina(nuevaPagina);
@@ -79,10 +118,19 @@ function iniciarPaginacion(productos, porPagina) {
     mostrarPagina(1);
 }
 
+function formatearMoneda(valorCLP) {
+    const tasa = tasasDivisas[monedaSeleccionada] || 1;
+    const convertido = valorCLP * tasa;
+    const opciones = {
+        style: 'currency',
+        currency: monedaSeleccionada,
+        minimumFractionDigits: 2
+    };
+    return new Intl.NumberFormat('es-CL', opciones).format(convertido);
+}
+
 function agregarAlCarrito(productoId) {
-    // Obtener carrito actual o crear uno nuevo
     let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-    // Buscar si ya está en el carrito
     const index = carrito.findIndex(item => item.id === productoId);
     if (index !== -1) {
         carrito[index].cantidad += 1;
@@ -102,6 +150,3 @@ function actualizarContadorCarrito() {
     if (cartCount) cartCount.textContent = total;
     if (mobileCartCount) mobileCartCount.textContent = total;
 }
-
-// Actualizar contador al cargar la página
-document.addEventListener('DOMContentLoaded', actualizarContadorCarrito);
