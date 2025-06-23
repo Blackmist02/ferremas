@@ -60,22 +60,17 @@ public class WebpayController {
         try {
             Map<String, Object> commitResult = webpayService.commitTransaction(tokenWs);
 
-            // Aquí puedes inspeccionar `commitResult` para determinar el estado de la transacción.
-            // Por ejemplo, `commitResult.get("response_code")` para saber si fue exitosa (0).
-            // y `commitResult.get("status")` (ej. "AUTHORIZED").
-
             if (commitResult != null && "AUTHORIZED".equals(commitResult.get("status")) &&
                 Integer.valueOf(0).equals(commitResult.get("response_code"))) {
-                // Transacción exitosa. Redirige al usuario a una página de éxito.
-                // Puedes pasar más datos en la URL si lo necesitas
-                return new RedirectView("/webpay/success?token=" + tokenWs);
+                // Transacción exitosa - Redirigir con ruta absoluta
+                return new RedirectView("/webpay-success.html?token=" + tokenWs);
             } else {
-                // Transacción fallida o rechazada. Redirige a una página de error.
-                return new RedirectView("/webpay/failure?token=" + tokenWs + "&error=" + commitResult.getOrDefault("response_code", "unknown"));
+                // Transacción fallida - Redirigir con ruta absoluta
+                return new RedirectView("/webpay-failure.html?token=" + tokenWs + "&error=" + commitResult.getOrDefault("response_code", "unknown"));
             }
         } catch (RuntimeException e) {
-            // Manejar errores de comunicación o lógicos
-            return new RedirectView("/webpay/failure?error=" + e.getMessage());
+            // Error en el procesamiento - Redirigir con ruta absoluta
+            return new RedirectView("/webpay-failure.html?error=" + e.getMessage());
         }
     }
 
