@@ -14,12 +14,7 @@ class SessionManager {
     static guardarSesion(usuario) {
         try {
             localStorage.setItem('usuarioActivo', JSON.stringify(usuario));
-            
-            // Notificar al header que se actualizó la sesión
-            if (window.onUsuarioLogueado) {
-                window.onUsuarioLogueado();
-            }
-            
+            console.log('✅ Sesión guardada:', usuario);
             return true;
         } catch (error) {
             console.error('Error al guardar sesión:', error);
@@ -29,12 +24,7 @@ class SessionManager {
 
     static cerrarSesion() {
         localStorage.removeItem('usuarioActivo');
-        
-        // Actualizar header si está disponible
-        if (window.actualizarHeader) {
-            window.actualizarHeader();
-        }
-        
+        console.log('❌ Sesión cerrada');
         return true;
     }
 
@@ -46,45 +36,25 @@ class SessionManager {
 // Hacer SessionManager disponible globalmente
 window.SessionManager = SessionManager;
 
-// Inicializar verificación de sesión al cargar
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Session.js cargado, verificando usuario...');
-    const usuario = SessionManager.obtenerUsuarioActivo();
-    
-    if (usuario) {
-        console.log('Usuario encontrado en session.js:', usuario.nombre);
-        // Actualizar header si existe
-        if (window.actualizarHeader) {
-            window.actualizarHeader();
-        }
-    } else {
-        console.log('No hay usuario logueado');
-    }
-});
-
-// Funciones globales de compatibilidad
+// Función global para cerrar sesión
 window.cerrarSesion = function() {
     if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
         SessionManager.cerrarSesion();
         alert('Sesión cerrada exitosamente');
-        
-        // Redirigir si no estás en la página principal
-        if (window.location.pathname !== '/index.html' && 
-            window.location.pathname !== '/' && 
-            !window.location.pathname.endsWith('/')) {
-            window.location.href = 'index.html';
-        } else {
-            window.location.reload();
-        }
+        window.location.href = 'index.html';
     }
 };
 
-window.verificarSesion = function() {
+// Verificar sesión al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🔍 Session.js cargado - verificando usuario...');
     const usuario = SessionManager.obtenerUsuarioActivo();
     
     if (usuario) {
-        mostrarUsuarioLogueado(usuario);
+        console.log('✅ Usuario encontrado:', usuario.nombre);
+        console.log('📧 Email:', usuario.correo);
+        console.log('🔑 Rol:', usuario.rol);
     } else {
-        mostrarLinksAuth();
+        console.log('❌ No hay usuario logueado');
     }
-};
+});

@@ -1,60 +1,58 @@
 <header class="bg-white shadow sticky top-0 z-50">
-    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-        <!-- Logo -->
-        <div class="flex items-center">
-            <a href="index.html" class="text-2xl font-bold text-purple-600">FerreMas</a>
-        </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <!-- Logo -->
+            <div class="flex-shrink-0">
+                <a href="index.html" class="text-2xl font-bold text-purple-600">FerreMas</a>
+            </div>
 
-        <!-- Navegación central -->
-        <nav class="hidden md:flex space-x-6">
-            <a href="index.html" class="text-gray-700 hover:text-purple-600 transition">Inicio</a>
-            <a href="productos.html" class="text-gray-700 hover:text-purple-600 transition">Productos</a>
-            <a href="divisas.html" class="text-gray-700 hover:text-purple-600 transition">Divisas</a>
-        </nav>
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex space-x-8">
+                <a href="index.html" class="text-gray-700 hover:text-purple-600 transition">Inicio</a>
+                <a href="productos.html" class="text-gray-700 hover:text-purple-600 transition">Productos</a>
+            </nav>
 
-        <!-- Área de usuario y carrito -->
-        <div class="flex items-center space-x-4">
-            <!-- Información de usuario logueado -->
-            <div id="user-info" class="hidden items-center space-x-3">
-                <span id="welcome-message" class="text-gray-700 text-sm font-medium bg-green-100 px-3 py-1 rounded-full"></span>
-                <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition">
-                    Cerrar Sesión
+            <!-- Desktop Right Side -->
+            <div class="hidden md:flex items-center space-x-4">
+                <!-- Info de usuario (cuando está logueado) -->
+                <div id="user-info" class="hidden items-center space-x-2">
+                    <span id="welcome-message" class="text-gray-700 font-medium bg-green-100 px-3 py-1 rounded"></span>
+                    <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition">
+                        Cerrar Sesión
+                    </button>
+                </div>
+
+                <!-- Enlaces de login/registro (cuando no está logueado) -->
+                <div id="auth-links" class="flex items-center space-x-2">
+                    <a href="login.html" class="text-gray-700 hover:text-purple-600 text-sm transition">Iniciar Sesión</a>
+                    <span class="text-gray-400">|</span>
+                    <a href="registro.html" class="text-gray-700 hover:text-purple-600 text-sm transition">Registro</a>
+                </div>
+
+                <!-- Carrito -->
+                <a href="carrito.html" class="relative flex items-center text-gray-700 hover:text-purple-600 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.6 7.2M7 13L5.4 5M7 13l2.2 8.8"></path>
+                    </svg>
+                    <span id="contador-carrito" class="ml-1 bg-purple-600 text-white text-xs rounded-full px-2 py-1">0</span>
+                </a>
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+                <button id="mobile-menu-btn" class="text-gray-700 hover:text-purple-600">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
                 </button>
             </div>
-
-            <!-- Enlaces de login/registro (cuando no está logueado) -->
-            <div id="auth-links" class="flex items-center space-x-2">
-                <a href="login.html" class="text-gray-700 hover:text-purple-600 text-sm transition">Iniciar Sesión</a>
-                <span class="text-gray-400">|</span>
-                <a href="registro.html" class="text-gray-700 hover:text-purple-600 text-sm transition">Registro</a>
-            </div>
-
-            <!-- Carrito -->
-            <a href="carrito.html" class="relative flex items-center text-gray-700 hover:text-purple-600 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h12.6M17 21a2 2 0 11-4 0 2 2 0 014 0zM9 21a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <span id="contador-carrito" class="ml-1 bg-purple-600 text-white text-xs rounded-full px-2 py-1">0</span>
-            </a>
         </div>
 
-        <!-- Menú móvil botón -->
-        <div class="md:hidden">
-            <button id="mobile-menu-btn" class="text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-        </div>
-    </div>
-
-    <!-- Menú móvil desplegable -->
-    <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
-        <nav class="container mx-auto px-4 py-2 space-y-2">
-            <a href="index.html" class="block text-gray-700 hover:text-purple-600 py-2">Inicio</a>
-            <a href="productos.html" class="block text-gray-700 hover:text-purple-600 py-2">Productos</a>
-            <a href="divisas.html" class="block text-gray-700 hover:text-purple-600 py-2">Divisas</a>
-            <a href="carrito.html" class="flex items-center text-gray-700 hover:text-purple-600 py-2">
+        <!-- Mobile menu -->
+        <nav id="mobile-menu" class="md:hidden hidden py-4 space-y-2">
+            <a href="index.html" class="block text-gray-700 hover:text-purple-600 py-1">Inicio</a>
+            <a href="productos.html" class="block text-gray-700 hover:text-purple-600 py-1">Productos</a>
+            <a href="carrito.html" class="flex items-center text-gray-700 hover:text-purple-600 py-1">
                 Carrito
                 <span id="mobile-cart-count" class="ml-2 bg-purple-600 text-white text-xs rounded-full px-2 py-1">0</span>
             </a>

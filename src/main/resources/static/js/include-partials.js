@@ -1,39 +1,29 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Cargando partials...');
-    
     // Cargar header
-    const headerElement = document.getElementById('header');
-    if (headerElement) {
+    const headerDiv = document.getElementById('header');
+    if (headerDiv) {
         fetch('partials/header.html')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('No se pudo cargar el header');
-                }
-                return response.text();
-            })
-            .then(html => {
-                headerElement.innerHTML = html;
-                console.log('Header cargado correctamente');
+            .then(response => response.text())
+            .then(data => {
+                headerDiv.innerHTML = data;
                 
-                // Verificar sesión después de cargar el header
+                // Después de cargar el header, configurar todo
                 setTimeout(() => {
-                    verificarSesionEnHeader();
+                    verificarSesionYConfigurar();
                 }, 100);
             })
             .catch(error => {
                 console.error('Error cargando header:', error);
-                headerElement.innerHTML = '<p>Error cargando header</p>';
             });
     }
-    
+
     // Cargar footer
-    const footerElement = document.getElementById('footer');
-    if (footerElement) {
+    const footerDiv = document.getElementById('footer');
+    if (footerDiv) {
         fetch('partials/footer.html')
             .then(response => response.text())
-            .then(html => {
-                footerElement.innerHTML = html;
-                console.log('Footer cargado correctamente');
+            .then(data => {
+                footerDiv.innerHTML = data;
             })
             .catch(error => {
                 console.error('Error cargando footer:', error);
@@ -41,69 +31,123 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function verificarSesionEnHeader() {
-    console.log('Verificando sesión en header...');
+function verificarSesionYConfigurar() {
+    console.log('🔧 Configurando header...');
     
-    // Obtener usuario del localStorage
-    const usuarioActivo = localStorage.getItem('usuarioActivo');
+    // Verificar sesión
+    const usuario = SessionManager ? SessionManager.obtenerUsuarioActivo() : null;
     
-    if (usuarioActivo) {
-        try {
-            const usuario = JSON.parse(usuarioActivo);
-            console.log('Usuario encontrado:', usuario.nombre);
-            mostrarUsuarioEnHeader(usuario);
-        } catch (error) {
-            console.error('Error parseando usuario:', error);
-            mostrarLinksAuthEnHeader();
-        }
+    if (usuario) {
+        console.log('✅ Mostrando usuario en header:', usuario.nombre);
+        mostrarUsuarioEnHeader(usuario);
     } else {
-        console.log('No hay usuario logueado');
-        mostrarLinksAuthEnHeader();
+        console.log('❌ Mostrando links de auth');
+        mostrarLinksAuth();
     }
+    
+    // Configurar eventos
+    configurarEventos();
+    
+    // Actualizar contador de carrito
+    actualizarContadorCarrito();
 }
 
 function mostrarUsuarioEnHeader(usuario) {
-    // Para desktop
-    const desktopAuth = document.getElementById('desktop-auth');
-    if (desktopAuth) {
-        desktopAuth.innerHTML = `
-            <span class="text-gray-700">Bienvenido, <strong>${usuario.nombre}</strong></span>
-            <button onclick="cerrarSesion()" class="text-red-600 hover:text-red-800 ml-4">Cerrar Sesión</button>
-        `;
-        console.log('Usuario mostrado en desktop');
+    // Desktop
+    const userInfo = document.getElementById('user-info');
+    const authLinks = document.getElementById('auth-links');
+    const welcomeMessage = document.getElementById('welcome-message');
+    
+    if (userInfo && authLinks && welcomeMessage) {
+        welcomeMessage.textContent = `Bienvenido, ${usuario.nombre}`;
+        userInfo.classList.remove('hidden');
+        userInfo.classList.add('flex');
+        authLinks.classList.add('hidden');
     }
+    
+    // Mobile
+    const mobileUserInfo = document.getElementById('mobile-user-info');
+    const mobileAuthLinks = document.getElementById('mobile-auth-links');
+    const mobileWelcomeMessage = document.getElementById('mobile-welcome-message');
+    
+    if (mobileUserInfo && mobileAuthLinks && mobileWelcomeMessage) {
+        mobileWelcomeMessage.textContent = `Bienvenido, ${usuario.nombre}`;
+        mobileUserInfo.classList.remove('hidden');
+        mobileAuthLinks.classList.add('hidden');
+    }
+}
 
-    // Para mobile
-    const mobileAuth = document.getElementById('mobile-auth');
-    if (mobileAuth) {
-        mobileAuth.innerHTML = `
-            <span class="block px-4 py-2 text-gray-700">Bienvenido, <strong>${usuario.nombre}</strong></span>
-            <button onclick="cerrarSesion()" class="block px-4 py-2 text-red-600 hover:bg-gray-100 w-full text-left">Cerrar Sesión</button>
-        `;
-        console.log('Usuario mostrado en mobile');
+function mostrarLinksAuth() {
+    // Desktop
+    const userInfo = document.getElementById('user-info');
+    const authLinks = document.getElementById('auth-links');
+    
+    if (userInfo && authLinks) {
+        userInfo.classList.add('hidden');
+        userInfo.classList.remove('flex');
+        authLinks.classList.remove('hidden');
+    }
+    
+    // Mobile
+    const mobileUserInfo = document.getElementById('mobile-user-info');
+    const mobileAuthLinks = document.getElementById('mobile-auth-links');
+    
+    if (mobileUserInfo && mobileAuthLinks) {
+        mobileUserInfo.classList.add('hidden');
+        mobileAuthLinks.classList.remove('hidden');
     }
 }
 
-function mostrarLinksAuthEnHeader() {
-    // Para desktop
-    const desktopAuth = document.getElementById('desktop-auth');
-    if (desktopAuth) {
-        desktopAuth.innerHTML = `
-            <a href="login.html" class="text-purple-600 hover:text-purple-800">Iniciar Sesión</a>
-            <span class="text-gray-400">|</span>
-            <a href="registro.html" class="text-purple-600 hover:text-purple-800">Registro</a>
-        `;
+function configurarEventos() {
+    // Logout buttons
+    const logoutBtn = document.getElementById('logout-btn');
+    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', window.cerrarSesion);
     }
-
-    // Para mobile
-    const mobileAuth = document.getElementById('mobile-auth');
-    if (mobileAuth) {
-        mobileAuth.innerHTML = `
-            <a href="login.html" class="block px-4 py-2 text-purple-600 hover:bg-gray-100">Iniciar Sesión</a>
-            <a href="registro.html" class="block px-4 py-2 text-purple-600 hover:bg-gray-100">Registro</a>
-        `;
+    
+    if (mobileLogoutBtn) {
+        mobileLogoutBtn.addEventListener('click', window.cerrarSesion);
+    }
+    
+    // Mobile menu
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
     }
 }
+
+function actualizarContadorCarrito() {
+    const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+    const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+    
+    const contadorDesktop = document.getElementById('contador-carrito');
+    const contadorMovil = document.getElementById('mobile-cart-count');
+    
+    if (contadorDesktop) {
+        contadorDesktop.textContent = totalItems;
+    }
+    
+    if (contadorMovil) {
+        contadorMovil.textContent = totalItems;
+    }
+}
+
+// Función global para actualizar header después del login
+window.actualizarHeader = function() {
+    console.log('🔄 Actualizando header...');
+    setTimeout(() => {
+        verificarSesionYConfigurar();
+    }, 100);
+};
+
+// Función global para actualizar carrito
+window.actualizarContadorCarrito = actualizarContadorCarrito;
 
 // Función global para cerrar sesión
 window.cerrarSesion = function() {
