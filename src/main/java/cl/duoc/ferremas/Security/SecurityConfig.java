@@ -13,30 +13,33 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF para APIs REST
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
-                // Permitir acceso público a recursos estáticos
-                .requestMatchers("/", "/index.html", "/login.html", "/registro.html").permitAll()
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/partials/**").permitAll()
-                .requestMatchers("/productos.html", "/productoInd.html", "/carrito.html").permitAll()
+                // Permitir acceso público a páginas web
+                .requestMatchers("/", "/index.html", "/productos.html", "/carrito.html", "/productoInd.html").permitAll()
+                .requestMatchers("/login.html", "/registro.html").permitAll()
                 .requestMatchers("/webpay-success.html", "/webpay-failure.html").permitAll()
                 
-                // Permitir acceso público a APIs específicas
+                // Permitir acceso a recursos estáticos
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/partials/**").permitAll()
+                .requestMatchers("/favicon.ico").permitAll()
+                
+                // APIs públicas (sin autenticación)
                 .requestMatchers("/api/usuarios/registro", "/api/usuarios/login").permitAll()
                 .requestMatchers("/api/productos/**").permitAll()
                 .requestMatchers("/api/divisas/**").permitAll()
                 .requestMatchers("/api/webpay/**").permitAll()
                 
-                // APIs administrativas requieren autenticación
-                .requestMatchers("/api/usuarios/usuario", "/api/usuarios/usuarios").authenticated()
-                .requestMatchers("/api/suc/**").authenticated()
-                .requestMatchers("/api/boleta/**").authenticated()
+                // APIs administrativas (requieren autenticación básica)
+                .requestMatchers("/api/usuarios/usuario", "/api/usuarios/usuarios").hasRole("ADMIN")
+                .requestMatchers("/api/suc/**").hasRole("ADMIN")
+                .requestMatchers("/api/boleta/**").hasRole("ADMIN")
                 
                 // Cualquier otra petición requiere autenticación
                 .anyRequest().authenticated()
             )
             .httpBasic(httpBasic -> {
-                // Configuración de autenticación básica solo para endpoints admin
+                httpBasic.realmName("Ferremas Admin API");
             });
 
         return http.build();

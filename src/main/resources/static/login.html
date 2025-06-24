@@ -34,12 +34,16 @@
     </p>
   </div>
 
+  <!-- Incluir SessionManager ANTES del script de login -->
+  <script src="js/session.js"></script>
   <script>
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
+
+      console.log('🔐 Intentando login con:', email);
 
       try {
         const response = await fetch('/api/usuarios/login', {
@@ -53,29 +57,28 @@
           })
         });
 
+        console.log('📡 Respuesta del servidor:', response.status);
         const data = await response.json();
+        console.log('📄 Datos recibidos:', data);
 
         if (data.success) {
-          // Guardar usuario en localStorage
-          localStorage.setItem('usuarioActivo', JSON.stringify(data.usuario));
+          // Guardar usuario en localStorage usando SessionManager
+          const guardado = SessionManager.guardarSesion(data.usuario);
           
-          console.log('Usuario guardado:', data.usuario);
-          
-          // Notificar al header que hay un usuario logueado
-          if (window.onUsuarioLogueado) {
-            window.onUsuarioLogueado();
-          }
+          console.log('✅ Usuario guardado:', data.usuario);
+          console.log('💾 Guardado exitoso:', guardado);
           
           alert(`¡Bienvenido ${data.usuario.nombre}!`);
           
           // Redirigir a la página principal
           window.location.href = "index.html";
         } else {
+          console.log('❌ Login fallido:', data.message);
           alert(data.message);
         }
 
       } catch (error) {
-        console.error('Error al iniciar sesión:', error);
+        console.error('💥 Error al iniciar sesión:', error);
         alert("Error al iniciar sesión. Por favor, inténtalo de nuevo.");
       }
     });

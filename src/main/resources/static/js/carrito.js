@@ -154,7 +154,31 @@ async function procesarCompra(total) {
     }
 
     try {
-        // Crear transacción Webpay (siempre en CLP)
+        // Obtener carrito
+        const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        
+        if (carrito.length === 0) {
+            alert('El carrito está vacío.');
+            return;
+        }
+
+        // 1. Verificar y reducir stock ANTES de procesar el pago
+        const stockResponse = await fetch('/api/productos/reducir-stock', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(carrito)
+        });
+
+        const stockResult = await stockResponse.json();
+        
+        if (!stockResult.success) {
+            alert('Error: ' + stockResult.errores.join('\n'));
+            return;
+        }
+
+        // 2. Si el stock se redujo correctamente, proceder con Webpay
         const response = await fetch('/api/webpay/create', {
             method: 'POST',
             headers: {
@@ -166,25 +190,53 @@ async function procesarCompra(total) {
         });
 
         if (!response.ok) {
+            // Si falla Webpay, restaurar el stock
+            await restaurarStock(carrito);
             throw new Error('Error al crear la transacción');
         }
 
         const data = await response.json();
         
         if (data.error) {
+            // Si falla Webpay, restaurar el stock
+            await restaurarStock(carrito);
             alert('Error: ' + data.error);
             return;
         }
 
-        // Redirigir a Webpay
+        // 3. Redirigir a Webpay
         if (data.url && data.token) {
+            // Guardar carrito temporalmente por si falla el pago
+            localStorage.setItem('carritoTemporal', JSON.stringify(carrito));
             window.location.href = data.url + '?token_ws=' + data.token;
         } else {
+            // Si no hay URL, restaurar stock
+            await restaurarStock(carrito);
             alert('Error: No se pudo obtener la URL de pago');
         }
 
     } catch (error) {
         console.error('Error al procesar la compra:', error);
         alert('Error al procesar la compra. Por favor, inténtalo de nuevo.');
+    }
+}
+
+// Función auxiliar para restaurar stock en caso de error
+async function restaurarStock(carrito) {
+    try {
+        const itemsParaRestaurar = carrito.map(item => ({
+            id: item.id,
+            cantidad: -item.cantidad // Cantidad negativa para restaurar
+        }));
+        
+        await fetch('/api/productos/restaurar-stock', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(itemsParaRestaurar)
+        });
+    } catch (error) {
+        console.error('Error al restaurar stock:', error);
     }
 }
