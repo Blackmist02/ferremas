@@ -129,4 +129,31 @@ public ResponseEntity<Productos> agregarPrecios(@PathVariable Long id, @RequestB
             return ResponseEntity.internalServerError().body(error);
         }
     }
+
+    @PostMapping("/restaurar-stock")
+    public ResponseEntity<Map<String, Object>> restaurarStock(@RequestBody List<Map<String, Object>> itemsCarrito) {
+        try {
+            for (Map<String, Object> item : itemsCarrito) {
+                Long productoId = Long.valueOf(item.get("id").toString());
+                Integer cantidad = Math.abs(Integer.valueOf(item.get("cantidad").toString()));
+                
+                Productos producto = productoService.findById(productoId);
+                if (producto != null) {
+                    producto.setStock(producto.getStock() + cantidad);
+                    productoService.save(producto);
+                }
+            }
+            
+            Map<String, Object> resultado = new HashMap<>();
+            resultado.put("success", true);
+            resultado.put("mensaje", "Stock restaurado correctamente");
+            return ResponseEntity.ok(resultado);
+            
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", "Error al restaurar stock");
+            return ResponseEntity.internalServerError().body(error);
+        }
+    }
 }

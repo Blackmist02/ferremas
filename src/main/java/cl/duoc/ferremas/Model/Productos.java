@@ -30,7 +30,7 @@ public class Productos {
     private String codigo;
     private String nombre;
     private String modelo;
-    private Integer Stock;
+    private Integer stock;
 
 
     @ElementCollection

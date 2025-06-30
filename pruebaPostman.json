@@ -1,0 +1,685 @@
+{
+    "info": {
+        "name": "Ferremas API - Pruebas de Rendimiento",
+        "description": "Colección de pruebas de rendimiento para todas las APIs de Ferremas",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "version": "1.0.0"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8081",
+            "type": "string"
+        },
+        {
+            "key": "iterations",
+            "value": "100",
+            "type": "string"
+        },
+        {
+            "key": "delay",
+            "value": "50",
+            "type": "string"
+        }
+    ],
+    "auth": {
+        "type": "noauth"
+    },
+    "item": [
+        {
+            "name": "🚀 Productos - Performance Tests",
+            "item": [
+                {
+                    "name": "GET Listar Productos - Carga Alta",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Test de rendimiento",
+                                    "pm.test('Response time bajo 500ms', function () {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                                    "});",
+                                    "",
+                                    "pm.test('Status code es 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response tiene productos', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.be.an('array');",
+                                    "    pm.expect(responseJson.length).to.be.greaterThan(0);",
+                                    "});",
+                                    "",
+                                    "// Métricas de rendimiento",
+                                    "const responseTime = pm.response.responseTime;",
+                                    "console.log(`Response Time: ${responseTime}ms`);",
+                                    "",
+                                    "if (responseTime > 200) {",
+                                    "    console.warn(`⚠️ Respuesta lenta: ${responseTime}ms`);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos/producto",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos", "producto"]
+                        }
+                    }
+                },
+                {
+                    "name": "POST Crear Producto - Stress Test",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Response time bajo 1000ms', function () {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                                    "});",
+                                    "",
+                                    "pm.test('Status code es 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Producto creado correctamente', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('id');",
+                                    "    pm.expect(responseJson).to.have.property('nombre');",
+                                    "});",
+                                    "",
+                                    "// Cleanup después del test",
+                                    "if (pm.response.json() && pm.response.json().id) {",
+                                    "    pm.globals.set('created_product_id', pm.response.json().id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "// Generar datos únicos para cada iteración",
+                                    "const timestamp = Date.now();",
+                                    "const random = Math.floor(Math.random() * 1000);",
+                                    "pm.variables.set('unique_code', `PERF-${timestamp}-${random}`);",
+                                    "pm.variables.set('unique_name', `Producto Test ${timestamp}`);",
+                                    "pm.variables.set('unique_price', Math.floor(Math.random() * 50000) + 1000);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"codigoProducto\": \"{{unique_code}}\",\n    \"marca\": \"TestMarca\",\n    \"codigo\": \"TEST-{{$randomInt}}\",\n    \"nombre\": \"{{unique_name}}\",\n    \"modelo\": \"ModeloTest\",\n    \"Stock\": {{$randomInt}},\n    \"precios\": [\n        {\n            \"fecha\": \"2025-01-15\",\n            \"valor\": {{unique_price}}\n        }\n    ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos/producto",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos", "producto"]
+                        }
+                    }
+                },
+                {
+                    "name": "POST Reducir Stock - Concurrencia",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Response time bajo 800ms', function () {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(800);",
+                                    "});",
+                                    "",
+                                    "pm.test('Status code válido (200 o 400)', function () {",
+                                    "    pm.expect([200, 400]).to.include(pm.response.code);",
+                                    "});",
+                                    "",
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Stock reducido exitosamente', function () {",
+                                    "        const responseJson = pm.response.json();",
+                                    "        pm.expect(responseJson.success).to.be.true;",
+                                    "    });",
+                                    "} else if (pm.response.code === 400) {",
+                                    "    pm.test('Error controlado por stock insuficiente', function () {",
+                                    "        const responseJson = pm.response.json();",
+                                    "        pm.expect(responseJson.success).to.be.false;",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n    {\n        \"id\": 1,\n        \"cantidad\": 1\n    },\n    {\n        \"id\": 2,\n        \"cantidad\": 1\n    }\n]"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos/reducir-stock",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos", "reducir-stock"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "👥 Usuarios - Performance Tests",
+            "item": [
+                {
+                    "name": "POST Registro Usuario - Load Test",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Response time bajo 1200ms', function () {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(1200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Status code válido (200 o 400)', function () {",
+                                    "    pm.expect([200, 400]).to.include(pm.response.code);",
+                                    "});",
+                                    "",
+                                    "const responseTime = pm.response.responseTime;",
+                                    "console.log(`Registro Usuario - Response Time: ${responseTime}ms`);",
+                                    "",
+                                    "if (responseTime > 800) {",
+                                    "    console.warn(`⚠️ Registro lento: ${responseTime}ms`);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const timestamp = Date.now();",
+                                    "const random = Math.floor(Math.random() * 10000);",
+                                    "pm.variables.set('unique_email', `test${timestamp}${random}@performance.com`);",
+                                    "pm.variables.set('unique_name', `Usuario Test ${random}`);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nombre\": \"{{unique_name}}\",\n    \"email\": \"{{unique_email}}\",\n    \"password\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios/registro",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "usuarios", "registro"]
+                        }
+                    }
+                },
+                {
+                    "name": "POST Login Usuario - Concurrencia",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Response time bajo 600ms', function () {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(600);",
+                                    "});",
+                                    "",
+                                    "pm.test('Status code válido (200 o 400)', function () {",
+                                    "    pm.expect([200, 400]).to.include(pm.response.code);",
+                                    "});",
+                                    "",
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Login exitoso', function () {",
+                                    "        const responseJson = pm.response.json();",
+                                    "        pm.expect(responseJson.success).to.be.true;",
+                                    "        pm.expect(responseJson.usuario).to.have.property('nombre');",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"ana.garcia@email.com\",\n    \"password\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios/login",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "usuarios", "login"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "💱 Divisas - Performance Tests",
+            "item": [
+                {
+                    "name": "GET Tasas de Cambio - Alta Frecuencia",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Response time bajo 2000ms', function () {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                                    "});",
+                                    "",
+                                    "pm.test('Status code es 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta contiene divisas', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('CLP');",
+                                    "    pm.expect(responseJson.CLP).to.eql(1);",
+                                    "});",
+                                    "",
+                                    "const responseTime = pm.response.responseTime;",
+                                    "console.log(`Divisas API - Response Time: ${responseTime}ms`);",
+                                    "",
+                                    "if (responseTime > 1000) {",
+                                    "    console.warn(`⚠️ API de divisas lenta: ${responseTime}ms`);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/divisas/tasas",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "divisas", "tasas"]
+                        }
+                    }
+                },
+                {
+                    "name": "GET Divisas Principales - Load Test",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Response time bajo 3000ms', function () {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                                    "});",
+                                    "",
+                                    "pm.test('Status code es 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "const responseTime = pm.response.responseTime;",
+                                    "console.log(`Divisas Principales - Response Time: ${responseTime}ms`);",
+                                    "",
+                                    "if (responseTime > 2000) {",
+                                    "    console.warn(`⚠️ Banco Central API muy lenta: ${responseTime}ms`);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/divisas/principales",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "divisas", "principales"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "💳 Webpay - Performance Tests",
+            "item": [
+                {
+                    "name": "POST Crear Transacción - Stress Test",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Response time bajo 5000ms', function () {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                                    "});",
+                                    "",
+                                    "pm.test('Status code válido (200 o 500)', function () {",
+                                    "    pm.expect([200, 500]).to.include(pm.response.code);",
+                                    "});",
+                                    "",
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Transacción creada con token y URL', function () {",
+                                    "        const responseJson = pm.response.json();",
+                                    "        pm.expect(responseJson).to.have.property('token');",
+                                    "        pm.expect(responseJson).to.have.property('url');",
+                                    "    });",
+                                    "}",
+                                    "",
+                                    "const responseTime = pm.response.responseTime;",
+                                    "console.log(`Webpay Create - Response Time: ${responseTime}ms`);",
+                                    "",
+                                    "if (responseTime > 3000) {",
+                                    "    console.warn(`⚠️ Webpay muy lento: ${responseTime}ms`);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "// Generar monto aleatorio entre 1000 y 100000",
+                                    "const amount = Math.floor(Math.random() * 99000) + 1000;",
+                                    "pm.variables.set('random_amount', amount);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"amount\": {{random_amount}}\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/webpay/create",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "webpay", "create"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "📋 Boletas - Performance Tests",
+            "item": [
+                {
+                    "name": "GET Listar Boletas - Load Test",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Response time bajo 800ms', function () {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(800);",
+                                    "});",
+                                    "",
+                                    "pm.test('Status code válido (200 o 204)', function () {",
+                                    "    pm.expect([200, 204]).to.include(pm.response.code);",
+                                    "});",
+                                    "",
+                                    "const responseTime = pm.response.responseTime;",
+                                    "console.log(`Listar Boletas - Response Time: ${responseTime}ms`);",
+                                    "",
+                                    "if (responseTime > 500) {",
+                                    "    console.warn(`⚠️ Listar boletas lento: ${responseTime}ms`);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "basic",
+                            "basic": [
+                                {
+                                    "key": "username",
+                                    "value": "admin",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "password",
+                                    "value": "admin",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/boleta/boleta",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "boleta", "boleta"]
+                        }
+                    }
+                },
+                {
+                    "name": "POST Crear Boleta - Concurrencia",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Response time bajo 1000ms', function () {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                                    "});",
+                                    "",
+                                    "pm.test('Status code es 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Boleta creada correctamente', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('id');",
+                                    "    pm.expect(responseJson).to.have.property('total');",
+                                    "});",
+                                    "",
+                                    "const responseTime = pm.response.responseTime;",
+                                    "console.log(`Crear Boleta - Response Time: ${responseTime}ms`);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const timestamp = Date.now();",
+                                    "const total = Math.floor(Math.random() * 50000) + 5000;",
+                                    "pm.variables.set('boleta_total', total);",
+                                    "pm.variables.set('boleta_cliente', `Cliente Test ${timestamp}`);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "basic",
+                            "basic": [
+                                {
+                                    "key": "username",
+                                    "value": "admin",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "password",
+                                    "value": "admin",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"fecha\": \"2025-01-15\",\n    \"total\": {{boleta_total}},\n    \"cliente\": \"{{boleta_cliente}}\",\n    \"token\": \"ferremas-performance-test\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/boleta/boletas",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "boleta", "boletas"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "📊 Test de Rendimiento Completo",
+            "item": [
+                {
+                    "name": "Flujo Completo - E2E Performance",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Test integral de rendimiento",
+                                    "pm.test('Flujo completo bajo 3000ms', function () {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                                    "});",
+                                    "",
+                                    "pm.test('Sistema responde correctamente', function () {",
+                                    "    pm.expect([200, 204]).to.include(pm.response.code);",
+                                    "});",
+                                    "",
+                                    "// Métricas finales",
+                                    "const responseTime = pm.response.responseTime;",
+                                    "console.log(`✅ Flujo E2E completado en: ${responseTime}ms`);",
+                                    "",
+                                    "// Reporte de rendimiento",
+                                    "if (responseTime < 500) {",
+                                    "    console.log('🚀 Excelente rendimiento');",
+                                    "} else if (responseTime < 1000) {",
+                                    "    console.log('✅ Buen rendimiento');",
+                                    "} else if (responseTime < 2000) {",
+                                    "    console.log('⚠️ Rendimiento aceptable');",
+                                    "} else {",
+                                    "    console.log('❌ Rendimiento deficiente');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "console.log('🏁 Iniciando test de rendimiento E2E...');",
+                                    "pm.globals.set('test_start_time', Date.now());"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos/producto",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos", "producto"]
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Configuración global para pruebas de rendimiento",
+                    "console.log('🚀 Ejecutando prueba de rendimiento...');",
+                    "pm.globals.set('request_start_time', Date.now());"
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Métricas globales de rendimiento",
+                    "const startTime = pm.globals.get('request_start_time');",
+                    "const endTime = Date.now();",
+                    "const totalTime = endTime - startTime;",
+                    "",
+                    "console.log(`⏱️ Tiempo total de request: ${totalTime}ms`);",
+                    "console.log(`📊 Response Time: ${pm.response.responseTime}ms`);",
+                    "console.log(`📈 Response Size: ${pm.response.responseSize} bytes`);",
+                    "",
+                    "// Test global de rendimiento",
+                    "pm.test('Sistema responde en tiempo razonable', function () {",
+                    "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                    "});",
+                    "",
+                    "// Alertas de rendimiento",
+                    "if (pm.response.responseTime > 2000) {",
+                    "    console.warn('⚠️ ALERTA: Response time muy alto: ' + pm.response.responseTime + 'ms');",
+                    "}",
+                    "",
+                    "if (pm.response.responseSize > 1000000) {",
+                    "    console.warn('⚠️ ALERTA: Response size muy grande: ' + pm.response.responseSize + ' bytes');",
+                    "}"
+                ]
+            }
+        }
+    ]
+}
