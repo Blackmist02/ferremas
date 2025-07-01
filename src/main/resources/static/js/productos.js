@@ -17,7 +17,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    fetch('/api/productos/producto')
+    // Cambié aquí la URL para que sea la correcta
+    fetch('/api/productos')
         .then(res => res.json())
         .then(data => {
             if (!Array.isArray(data) || data.length === 0) {
@@ -80,11 +81,11 @@ function iniciarPaginacion(productos, porPagina) {
                     <h3 class="text-lg font-semibold mb-1">${producto.nombre}</h3>
                     <p class="text-sm text-gray-600 mb-1"><strong>Marca:</strong> ${producto.marca}</p>
                     <p class="text-sm text-gray-600 mb-1"><strong>Modelo:</strong> ${producto.modelo}</p>
-                    <p class="text-sm text-gray-600 mb-1"><strong>Stock:</strong> ${producto.Stock}</p>
+                    <p class="text-sm text-gray-600 mb-1"><strong>Stock:</strong> ${producto.stock}</p>
                     <p class="text-purple-700 font-bold text-lg mb-2">
                         ${precioReciente ? formatearMoneda(precioReciente.valor) : 'No disponible'}
                     </p>
-                    <a href="productoInd.html?producto=${producto.id}" class="bg-purple-600 hover:bg-purple-800 text-white px-4 py-2 rounded transition">Ver detalle</a>
+                    <a href="productoInd.html?producto=${encodeURIComponent(producto.codigoProducto)}" class="bg-purple-600 hover:bg-purple-800 text-white px-4 py-2 rounded transition">Ver detalle</a>
                     <button onclick="agregarAlCarrito(${producto.id})" class="bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded transition">Agregar al carrito</button>
                 </div>
             `;
@@ -97,15 +98,12 @@ function iniciarPaginacion(productos, porPagina) {
         const pag = document.getElementById('pagination');
         pag.innerHTML = '';
 
-        // Botón anterior
         pag.innerHTML += `<button ${paginaActual === 1 ? 'disabled' : ''} class="px-3 py-1 rounded ${paginaActual === 1 ? 'bg-gray-300 text-gray-500' : 'bg-purple-600 text-white hover:bg-purple-800'}" onclick="window.cambiarPagina(${paginaActual - 1})">Anterior</button>`;
 
-        // Números de página
         for (let i = 1; i <= totalPaginas; i++) {
             pag.innerHTML += `<button class="px-3 py-1 rounded mx-1 ${i === paginaActual ? 'bg-purple-800 text-white' : 'bg-purple-200 text-purple-800 hover:bg-purple-400'}" onclick="window.cambiarPagina(${i})">${i}</button>`;
         }
 
-        // Botón siguiente
         pag.innerHTML += `<button ${paginaActual === totalPaginas ? 'disabled' : ''} class="px-3 py-1 rounded ${paginaActual === totalPaginas ? 'bg-gray-300 text-gray-500' : 'bg-purple-600 text-white hover:bg-purple-800'}" onclick="window.cambiarPagina(${paginaActual + 1})">Siguiente</button>`;
     }
 
