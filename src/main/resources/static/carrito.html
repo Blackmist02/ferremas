@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Carrito de Compras</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css" />
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 text-gray-800">
+
     <div id="header"></div>
-    <main class="container mx-auto py-8">
-        <h2 class="text-2xl font-bold mb-6 text-center">Carrito de Compras</h2>
-        <div id="carrito-lista" class="bg-white rounded-lg shadow-md p-6"></div>
+
+    <main class="container mx-auto py-8 px-4">
+        <h2 class="text-3xl font-bold mb-8 text-center text-teal-800">Carrito de Compras</h2>
+        <div id="carrito-lista" class="bg-white rounded-lg shadow-md p-6 min-h-[200px]">
+            <!-- Contenido dinámico del carrito -->
+        </div>
         <div class="mt-8 text-center">
-            <a href="productos.html" class="btn btn-primary bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-800">Seguir comprando</a>
+            <a href="productos.html" 
+               class="btn btn-primary bg-red-600 text-white px-6 py-3 rounded hover:bg-red-800 transition font-semibold">
+               Seguir comprando
+            </a>
         </div>
     </main>
+
     <div id="footer"></div>
+
     <script src="js/include-partials.js"></script>
     <script src="js/carrito.js"></script>
 </body>
