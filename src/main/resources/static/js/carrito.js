@@ -148,20 +148,27 @@ async function cargarDivisasRapido() {
     return tasasDivisas;
 }
 
-// ✅ Cargar SOLO productos que están en el carrito
+// ✅ Cargar SOLO productos que están en el carrito (SIN LÍMITES)
 async function cargarProductosDelCarrito(idsProductos) {
     if (idsProductos.length === 0) return [];
     
     try {
+        console.log(`🔍 === CARGANDO PRODUCTOS DEL CARRITO ===`);
+        console.log(`🔍 IDs solicitados: [${idsProductos.join(', ')}]`);
+        console.log(`🔍 Cantidad total de productos: ${idsProductos.length}`);
+        
         // ✅ Verificar cache primero
         const productosEncontrados = [];
         const idsNecesarios = [];
         
         idsProductos.forEach(id => {
             if (productosCarritoCache.has(id)) {
-                productosEncontrados.push(productosCarritoCache.get(id));
+                const productoCache = productosCarritoCache.get(id);
+                productosEncontrados.push(productoCache);
+                console.log(`💾 Producto ${id} encontrado en cache: ${productoCache.nombre}`);
             } else {
                 idsNecesarios.push(id);
+                console.log(`🔍 Producto ${id} necesita ser cargado`);
             }
         });
         
@@ -171,41 +178,101 @@ async function cargarProductosDelCarrito(idsProductos) {
         if (idsNecesarios.length > 0) {
             console.log(`🔍 Cargando productos específicos:`, idsNecesarios);
             
-            // ✅ Cargar productos específicos en paralelo
+            // ✅ Intentar múltiples estrategias de carga
+            let productosNuevos = [];
+            
+            // ESTRATEGIA 1: Cargar productos individuales
+            console.log(`📡 Estrategia 1: Carga individual de ${idsNecesarios.length} productos`);
             const promesasProductos = idsNecesarios.map(async id => {
                 try {
                     const controller = new AbortController();
-                    setTimeout(() => controller.abort(), 3000); // 3 segundos por producto
+                    setTimeout(() => controller.abort(), 5000); // 5 segundos por producto
                     
+                    console.log(`📡 Cargando producto individual: ${id}`);
                     const res = await fetch(`/api/productos/${id}`, {
                         signal: controller.signal,
                         headers: { 'Cache-Control': 'max-age=300' }
                     });
                     
                     if (res.ok) {
-                        return await res.json();
+                        const producto = await res.json();
+                        console.log(`✅ Producto ${id} cargado: ${producto.nombre}`);
+                        return producto;
                     } else {
-                        console.warn(`⚠️ Producto ${id} no encontrado (HTTP ${res.status})`);
+                        console.warn(`⚠️ Producto ${id} no encontrado individualmente (HTTP ${res.status})`);
                         return null;
                     }
                 } catch (error) {
-                    console.error(`❌ Error cargando producto ${id}:`, error.message);
+                    console.error(`❌ Error cargando producto individual ${id}:`, error.message);
                     return null;
                 }
             });
             
-            const productosNuevos = await Promise.all(promesasProductos);
+            productosNuevos = await Promise.all(promesasProductos);
+            productosNuevos = productosNuevos.filter(p => p !== null);
             
-            // ✅ Agregar al cache y resultado (filtrar nulls)
+            console.log(`📊 Estrategia 1 resultado: ${productosNuevos.length}/${idsNecesarios.length} productos cargados`);
+            
+            // ESTRATEGIA 2: Si faltan productos, buscar en lista completa
+            const idsNoEncontrados = idsNecesarios.filter(id => 
+                !productosNuevos.some(p => p.id === id)
+            );
+            
+            if (idsNoEncontrados.length > 0) {
+                console.log(`🔍 Estrategia 2: Buscando ${idsNoEncontrados.length} productos en lista completa`);
+                
+                try {
+                    const resLista = await fetch('/api/productos/producto', {
+                        headers: { 'Cache-Control': 'max-age=300' }
+                    });
+                    
+                    if (resLista.ok) {
+                        const dataLista = await resLista.json();
+                        let todosLosProductos = [];
+                        
+                        if (dataLista.content && Array.isArray(dataLista.content)) {
+                            todosLosProductos = dataLista.content;
+                        } else if (Array.isArray(dataLista)) {
+                            todosLosProductos = dataLista;
+                        }
+                        
+                        console.log(`📡 Lista completa cargada: ${todosLosProductos.length} productos`);
+                        
+                        // Buscar productos faltantes en la lista
+                        idsNoEncontrados.forEach(id => {
+                            const productoEncontrado = todosLosProductos.find(p => p.id === id);
+                            if (productoEncontrado) {
+                                productosNuevos.push(productoEncontrado);
+                                console.log(`✅ Producto ${id} encontrado en lista: ${productoEncontrado.nombre}`);
+                            } else {
+                                console.warn(`⚠️ Producto ${id} NO encontrado en ningún lado`);
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('❌ Error en estrategia 2:', error);
+                }
+            }
+            
+            // ✅ Agregar al cache y resultado
             productosNuevos.forEach(producto => {
-                if (producto) {
+                if (producto && producto.id) {
                     productosCarritoCache.set(producto.id, producto);
                     productosEncontrados.push(producto);
+                    console.log(`💾 Producto ${producto.id} agregado al cache: ${producto.nombre}`);
                 }
             });
         }
         
-        console.log(`✅ Total productos del carrito cargados: ${productosEncontrados.length}`);
+        console.log(`✅ === RESUMEN CARGA DE PRODUCTOS ===`);
+        console.log(`✅ Productos solicitados: ${idsProductos.length}`);
+        console.log(`✅ Productos encontrados: ${productosEncontrados.length}`);
+        console.log(`✅ Lista de productos cargados:`, productosEncontrados.map(p => ({
+            id: p.id,
+            nombre: p.nombre?.substring(0, 30) + '...',
+            precio: p.precios?.[0]?.valor || 'Sin precio'
+        })));
+        
         return productosEncontrados;
         
     } catch (error) {
@@ -214,12 +281,18 @@ async function cargarProductosDelCarrito(idsProductos) {
     }
 }
 
-// ✅ Mostrar carrito optimizado - solo productos necesarios
+// ✅ Mostrar carrito optimizado - TODOS los productos
 async function mostrarCarritoOptimizado() {
     const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
     const cont = document.getElementById('carrito-lista');
     
-    console.log(`🛒 Procesando carrito con ${carrito.length} items`);
+    console.log(`🛒 === PROCESANDO CARRITO COMPLETO ===`);
+    console.log(`🛒 Items en carrito: ${carrito.length}`);
+    console.log(`🛒 Detalle del carrito:`, carrito.map((item, index) => ({
+        index: index + 1,
+        id: item.id,
+        cantidad: item.cantidad
+    })));
     
     if (carrito.length === 0) {
         cont.innerHTML = `
@@ -240,41 +313,61 @@ async function mostrarCarritoOptimizado() {
     }
     
     try {
-        // ✅ Obtener solo IDs únicos de productos en el carrito
+        // ✅ Obtener TODOS los IDs únicos de productos en el carrito (SIN LÍMITES)
         const idsProductos = [...new Set(carrito.map(item => item.id))];
-        console.log(`🔍 IDs únicos en carrito:`, idsProductos);
+        console.log(`🔍 IDs únicos en carrito (${idsProductos.length}):`, idsProductos);
         
-        // ✅ Cargar SOLO productos del carrito
+        // ✅ Cargar TODOS los productos del carrito
         const productos = await cargarProductosDelCarrito(idsProductos);
         
         if (productos.length === 0) {
             throw new Error('No se pudieron cargar los productos del carrito');
         }
         
-        console.log(`✅ Renderizando carrito con ${productos.length} productos`);
-        renderizarCarritoRapido(carrito, productos, cont);
+        // ✅ Verificar que tenemos TODOS los productos necesarios
+        const idsEncontrados = productos.map(p => p.id);
+        const idsFaltantes = idsProductos.filter(id => !idsEncontrados.includes(id));
+        
+        if (idsFaltantes.length > 0) {
+            console.warn(`⚠️ Productos faltantes en carrito: [${idsFaltantes.join(', ')}]`);
+            console.warn(`⚠️ Estos productos se mostrarán como "Producto no disponible"`);
+        }
+        
+        console.log(`✅ Renderizando carrito completo:`);
+        console.log(`✅ - Items en carrito: ${carrito.length}`);
+        console.log(`✅ - Productos únicos: ${idsProductos.length}`);
+        console.log(`✅ - Productos cargados: ${productos.length}`);
+        console.log(`✅ - Productos faltantes: ${idsFaltantes.length}`);
+        
+        renderizarCarritoCompleto(carrito, productos, cont, idsFaltantes);
         
     } catch (error) {
         console.error('❌ Error al mostrar carrito:', error);
-        throw error; // Re-lanzar para que sea capturado por Promise.allSettled
+        throw error;
     }
 }
 
-// ✅ Renderizado ultra optimizado
-function renderizarCarritoRapido(carrito, productos, contenedor) {
+// ✅ Renderizado COMPLETO - todos los productos
+function renderizarCarritoCompleto(carrito, productos, contenedor, idsFaltantes = []) {
     let total = 0;
-    const productosMap = new Map(productos.map(p => [p.id, p])); // O(1) lookup
+    const productosMap = new Map(productos.map(p => [p.id, p]));
     
-    console.log(`🎨 Renderizando ${carrito.length} items del carrito`);
+    console.log(`🎨 === RENDERIZANDO CARRITO COMPLETO ===`);
+    console.log(`🎨 Items a renderizar: ${carrito.length}`);
+    console.log(`🎨 Productos disponibles: ${productos.length}`);
+    console.log(`🎨 Productos faltantes: ${idsFaltantes.length}`);
     
     // ✅ Crear elementos de forma más eficiente
     const fragment = document.createDocumentFragment();
     
-    // Selector de moneda
+    // Selector de moneda y resumen
     const selectorDiv = document.createElement('div');
     selectorDiv.className = 'mb-6 flex justify-between items-center bg-gray-50 p-4 rounded-lg';
     selectorDiv.innerHTML = `
-        <h3 class="text-lg font-semibold text-gray-800">Resumen del pedido</h3>
+        <div>
+            <h3 class="text-lg font-semibold text-gray-800">Resumen del pedido</h3>
+            <p class="text-sm text-gray-600">${carrito.length} producto${carrito.length !== 1 ? 's' : ''} en tu carrito</p>
+        </div>
         <div class="flex items-center space-x-2">
             <label class="text-sm text-gray-600">Moneda:</label>
             <select id="currency-selector-carrito" class="px-3 py-1 rounded border border-gray-300 text-sm">
@@ -286,17 +379,56 @@ function renderizarCarritoRapido(carrito, productos, contenedor) {
     `;
     fragment.appendChild(selectorDiv);
     
-    // ✅ Lista de productos optimizada
+    // ✅ Lista COMPLETA de productos
     const productosDiv = document.createElement('div');
     productosDiv.className = 'space-y-4';
     
-    carrito.forEach(item => {
+    // ✅ Renderizar TODOS los items del carrito
+    carrito.forEach((item, index) => {
+        console.log(`🎨 Renderizando item ${index + 1}/${carrito.length}: ID ${item.id}, Cantidad ${item.cantidad}`);
+        
         const prod = productosMap.get(item.id);
+        
+        // ✅ Manejar productos no encontrados
         if (!prod) {
-            console.warn(`⚠️ Producto ${item.id} no encontrado en el carrito`);
+            console.warn(`⚠️ Producto ${item.id} no encontrado, mostrando como no disponible`);
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex items-center justify-between bg-red-50 p-4 rounded-lg shadow-sm border border-red-200';
+            itemDiv.innerHTML = `
+                <div class="flex items-center space-x-4 flex-1">
+                    <div class="w-15 h-15 bg-red-200 rounded flex items-center justify-center">
+                        <span class="text-red-600 text-lg">❌</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-red-800">Producto no disponible</h4>
+                        <p class="text-sm text-red-600">ID: ${item.id}</p>
+                        <p class="text-sm text-red-600">Este producto ya no está disponible</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-center">
+                        <p class="text-sm text-red-500">Cantidad</p>
+                        <p class="font-bold text-red-700">${item.cantidad}</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-red-500">Subtotal</p>
+                        <p class="font-bold text-lg text-red-700">No disponible</p>
+                    </div>
+                    <button onclick="eliminarDelCarrito(${item.id})" 
+                            class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition"
+                            title="Eliminar producto no disponible">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            productosDiv.appendChild(itemDiv);
             return;
         }
         
+        // ✅ Producto encontrado - renderizar normalmente
         const precioReciente = prod.precios?.length 
             ? prod.precios.reduce((a, b) => (a.fecha > b.fecha ? a : b))
             : null;
@@ -307,8 +439,15 @@ function renderizarCarritoRapido(carrito, productos, contenedor) {
         const subtotalConvertido = convertirMonedaRapido(subtotalCLP);
         total += subtotalCLP;
         
+        // ✅ Información de stock
+        const stockInfo = prod.stock <= 0 ? 
+            '<span class="text-red-600 text-xs">Sin stock</span>' :
+            prod.stock <= 5 ?
+            `<span class="text-yellow-600 text-xs">Poco stock (${prod.stock})</span>` :
+            `<span class="text-green-600 text-xs">Stock: ${prod.stock}</span>`;
+        
         const itemDiv = document.createElement('div');
-        itemDiv.className = 'flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border';
+        itemDiv.className = `flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border ${prod.stock <= 0 ? 'border-red-200 bg-red-50' : ''}`;
         itemDiv.innerHTML = `
             <div class="flex items-center space-x-4 flex-1">
                 <img src="https://placehold.co/60x60/8B5CF6/FFFFFF?text=${encodeURIComponent(prod.nombre.charAt(0))}" 
@@ -317,14 +456,34 @@ function renderizarCarritoRapido(carrito, productos, contenedor) {
                      onerror="this.style.backgroundColor='#e5e7eb'; this.style.color='#6b7280';">
                 <div class="flex-1">
                     <h4 class="font-semibold text-gray-800">${prod.nombre}</h4>
-                    <p class="text-sm text-gray-600">${prod.marca} - ${prod.modelo}</p>
-                    <p class="text-sm font-medium text-green-600">${formatearMonedaRapido(precioConvertido)} c/u</p>
+                    <p class="text-sm text-gray-600">${prod.marca} - ${prod.modelo || 'N/A'}</p>
+                    <div class="flex items-center space-x-2">
+                        <p class="text-sm font-medium text-green-600">${formatearMonedaRapido(precioConvertido)} c/u</p>
+                        ${stockInfo}
+                    </div>
+                    <p class="text-xs text-gray-500">Código: ${prod.codigo_producto || prod.codigoProducto || prod.id}</p>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
                 <div class="text-center">
                     <p class="text-sm text-gray-500">Cantidad</p>
-                    <p class="font-bold">${item.cantidad}</p>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="cambiarCantidad(${item.id}, ${item.cantidad - 1})" 
+                                class="bg-gray-200 hover:bg-gray-300 text-gray-700 w-8 h-8 rounded-full transition"
+                                ${item.cantidad <= 1 ? 'disabled' : ''}>
+                            <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                            </svg>
+                        </button>
+                        <span class="font-bold text-lg w-8 text-center">${item.cantidad}</span>
+                        <button onclick="cambiarCantidad(${item.id}, ${item.cantidad + 1})" 
+                                class="bg-gray-200 hover:bg-gray-300 text-gray-700 w-8 h-8 rounded-full transition"
+                                ${prod.stock <= item.cantidad ? 'disabled' : ''}>
+                            <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="text-center">
                     <p class="text-sm text-gray-500">Subtotal</p>
@@ -340,6 +499,8 @@ function renderizarCarritoRapido(carrito, productos, contenedor) {
             </div>
         `;
         productosDiv.appendChild(itemDiv);
+        
+        console.log(`✅ Item ${index + 1} renderizado: ${prod.nombre} x${item.cantidad} = ${formatearMonedaRapido(subtotalConvertido)}`);
     });
     
     fragment.appendChild(productosDiv);
@@ -348,16 +509,37 @@ function renderizarCarritoRapido(carrito, productos, contenedor) {
     const totalDiv = document.createElement('div');
     totalDiv.className = 'mt-6 bg-gray-50 p-6 rounded-lg';
     totalDiv.innerHTML = `
-        <div class="flex justify-between items-center mb-4">
-            <span class="text-xl font-bold text-gray-800">Total:</span>
-            <div class="text-right">
-                <span class="text-2xl font-bold text-green-600">${formatearMonedaRapido(convertirMonedaRapido(total))}</span>
-                ${monedaSeleccionada !== 'CLP' ? `<p class="text-sm text-gray-500">${formatearMonedaRapido(total, 'CLP')} CLP</p>` : ''}
+        <div class="mb-4">
+            <div class="flex justify-between items-center text-lg mb-2">
+                <span class="text-gray-700">Subtotal (${carrito.length} productos):</span>
+                <span class="font-semibold">${formatearMonedaRapido(convertirMonedaRapido(total))}</span>
+            </div>
+            <div class="flex justify-between items-center text-sm text-gray-600 mb-2">
+                <span>Envío:</span>
+                <span>Gratis</span>
+            </div>
+            <hr class="my-3">
+            <div class="flex justify-between items-center">
+                <span class="text-xl font-bold text-gray-800">Total:</span>
+                <div class="text-right">
+                    <span class="text-2xl font-bold text-green-600">${formatearMonedaRapido(convertirMonedaRapido(total))}</span>
+                    ${monedaSeleccionada !== 'CLP' ? `<p class="text-sm text-gray-500">${formatearMonedaRapido(total, 'CLP')} CLP</p>` : ''}
+                </div>
             </div>
         </div>
+        
+        ${idsFaltantes.length > 0 ? `
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <p class="text-yellow-800 text-sm">
+                    ⚠️ Algunos productos en tu carrito ya no están disponibles. Elimínalos para continuar.
+                </p>
+            </div>
+        ` : ''}
+        
         <button onclick="procesarCompraRapido(${total})" 
-                class="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-lg font-bold text-lg transition transform hover:scale-105">
-                🛒 Pagar con Webpay
+                class="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-lg font-bold text-lg transition transform hover:scale-105 ${idsFaltantes.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+                ${idsFaltantes.length > 0 ? 'disabled' : ''}>
+                🛒 ${idsFaltantes.length > 0 ? 'Productos no disponibles' : 'Pagar con Webpay'}
         </button>
         <p class="text-xs text-gray-500 text-center mt-2">El pago se procesará en pesos chilenos (CLP)</p>
     `;
@@ -372,11 +554,15 @@ function renderizarCarritoRapido(carrito, productos, contenedor) {
     if (currencySelector) {
         currencySelector.addEventListener('change', (e) => {
             monedaSeleccionada = e.target.value;
-            mostrarCarritoOptimizado(); // Usar versión optimizada
+            mostrarCarritoOptimizado();
         });
     }
     
-    console.log(`✅ Carrito renderizado exitosamente con total: $${total.toLocaleString()}`);
+    console.log(`✅ === CARRITO RENDERIZADO COMPLETAMENTE ===`);
+    console.log(`✅ Total items renderizados: ${carrito.length}`);
+    console.log(`✅ Total productos únicos: ${productos.length}`);
+    console.log(`✅ Productos faltantes: ${idsFaltantes.length}`);
+    console.log(`✅ Total del carrito: ${formatearMonedaRapido(convertirMonedaRapido(total))}`);
 }
 
 // ✅ Funciones de conversión optimizadas
@@ -568,3 +754,39 @@ function mostrarNotificacionRapida(mensaje, tipo = 'info') {
 window.mostrarCarrito = mostrarCarritoOptimizado;
 window.procesarCompra = procesarCompraRapido;
 window.reintentarCarrito = reintentarCarrito;
+
+// ✅ Nueva función para cambiar cantidad
+function cambiarCantidad(id, nuevaCantidad) {
+    if (nuevaCantidad <= 0) {
+        eliminarDelCarrito(id);
+        return;
+    }
+    
+    try {
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        const index = carrito.findIndex(item => item.id === id);
+        
+        if (index !== -1) {
+            carrito[index].cantidad = nuevaCantidad;
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+            
+            // Actualizar carrito
+            mostrarCarritoOptimizado();
+            
+            // Actualizar contador
+            if (window.actualizarContadorCarrito) {
+                window.actualizarContadorCarrito();
+            }
+            
+            mostrarNotificacionRapida('Cantidad actualizada', 'success');
+        }
+        
+    } catch (error) {
+        console.error('Error al cambiar cantidad:', error);
+        mostrarNotificacionRapida('Error al actualizar cantidad', 'error');
+    }
+}
+
+// ✅ Exportar nuevas funciones
+window.cambiarCantidad = cambiarCantidad;
+window.renderizarCarritoCompleto = renderizarCarritoCompleto;
