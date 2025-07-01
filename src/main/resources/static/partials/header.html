@@ -1,254 +1,74 @@
 <header class="bg-white shadow sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-            <!-- Logo -->
-            <div class="flex-shrink-0">
-                <a href="index.html" class="text-2xl font-bold text-purple-600">FerreMas</a>
-            </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo -->
+      <div class="flex-shrink-0">
+        <a href="index.html" class="text-2xl font-bold text-purple-600">FerreMas</a>
+      </div>
 
-            <!-- Desktop Navigation -->
-            <nav class="hidden md:flex space-x-8">
-                <a href="index.html" class="text-gray-700 hover:text-purple-600 transition">Inicio</a>
-                <a href="productos.html" class="text-gray-700 hover:text-purple-600 transition">Productos</a>
-            </nav>
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex space-x-8">
+        <a href="index.html" class="text-gray-700 hover:text-purple-600 transition">Inicio</a>
+        <a href="productos.html" class="text-gray-700 hover:text-purple-600 transition">Productos</a>
+      </nav>
 
-            <!-- Desktop Right Side -->
-            <div class="hidden md:flex items-center space-x-4">
-                <!-- Info de usuario (cuando está logueado) -->
-                <div id="user-info" class="hidden items-center space-x-2">
-                    <span id="welcome-message" class="text-gray-700 font-medium bg-green-100 px-3 py-1 rounded"></span>
-                    <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition">
-                        Cerrar Sesión
-                    </button>
-                </div>
-
-                <!-- Enlaces de login/registro (cuando no está logueado) -->
-                <div id="auth-links" class="flex items-center space-x-2">
-                    <a href="login.html" class="text-gray-700 hover:text-purple-600 text-sm transition">Iniciar Sesión</a>
-                    <span class="text-gray-400">|</span>
-                    <a href="registro.html" class="text-gray-700 hover:text-purple-600 text-sm transition">Registro</a>
-                </div>
-
-                <!-- Carrito -->
-                <a href="carrito.html" class="relative flex items-center text-gray-700 hover:text-purple-600 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.6 7.2M7 13L5.4 5M7 13l2.2 8.8"></path>
-                    </svg>
-                    <span id="contador-carrito" class="ml-1 bg-purple-600 text-white text-xs rounded-full px-2 py-1">0</span>
-                </a>
-            </div>
-
-            <!-- Mobile menu button -->
-            <div class="md:hidden">
-                <button id="mobile-menu-btn" class="text-gray-700 hover:text-purple-600">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-            </div>
+      <!-- Desktop Right Side -->
+      <div class="hidden md:flex items-center space-x-4">
+        <!-- Info de usuario (cuando está logueado) -->
+        <div id="user-info" class="hidden items-center space-x-2">
+          <span id="welcome-message" class="text-gray-700 font-medium bg-green-100 px-3 py-1 rounded"></span>
+          <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition">
+            Cerrar Sesión
+          </button>
         </div>
 
-        <!-- Mobile menu -->
-        <nav id="mobile-menu" class="md:hidden hidden py-4 space-y-2">
-            <a href="index.html" class="block text-gray-700 hover:text-purple-600 py-1">Inicio</a>
-            <a href="productos.html" class="block text-gray-700 hover:text-purple-600 py-1">Productos</a>
-            <a href="carrito.html" class="flex items-center text-gray-700 hover:text-purple-600 py-1">
-                Carrito
-                <span id="mobile-cart-count" class="ml-2 bg-purple-600 text-white text-xs rounded-full px-2 py-1">0</span>
-            </a>
-            
-            <!-- Información de usuario móvil -->
-            <div id="mobile-user-info" class="hidden border-t pt-2">
-                <span id="mobile-welcome-message" class="block text-gray-700 py-1 font-medium bg-green-100 px-3 py-1 rounded"></span>
-                <button id="mobile-logout-btn" class="block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm mt-2">
-                    Cerrar Sesión
-                </button>
-            </div>
-            
-            <!-- Enlaces móviles de login/registro -->
-            <div id="mobile-auth-links" class="border-t pt-2 space-y-1">
-                <a href="login.html" class="block text-gray-700 hover:text-purple-600 py-1">Iniciar Sesión</a>
-                <a href="registro.html" class="block text-gray-700 hover:text-purple-600 py-1">Registro</a>
-            </div>
-        </nav>
+        <!-- Enlaces de login/registro (cuando no está logueado) -->
+        <div id="auth-links" class="flex items-center space-x-2">
+          <a href="login.html" class="text-gray-700 hover:text-purple-600 text-sm transition">Iniciar Sesión</a>
+          <span class="text-gray-400">|</span>
+          <a href="registro.html" class="text-gray-700 hover:text-purple-600 text-sm transition">Registro</a>
+        </div>
+
+        <!-- Carrito -->
+        <a href="carrito.html" class="relative flex items-center text-gray-700 hover:text-purple-600 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.6 7.2M7 13L5.4 5M7 13l2.2 8.8"></path>
+          </svg>
+          <span id="contador-carrito" class="ml-1 bg-purple-600 text-white text-xs rounded-full px-2 py-1">0</span>
+        </a>
+      </div>
+
+      <!-- Mobile menu button -->
+      <div class="md:hidden">
+        <button id="mobile-menu-btn" class="text-gray-700 hover:text-purple-600">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
     </div>
-</header>
 
-<!-- Script del header -->
-<script>
-// Variables globales
-let usuarioActivo = null;
+    <!-- Mobile menu -->
+    <nav id="mobile-menu" class="md:hidden hidden py-4 space-y-2">
+      <a href="index.html" class="block text-gray-700 hover:text-purple-600 py-1">Inicio</a>
+      <a href="productos.html" class="block text-gray-700 hover:text-purple-600 py-1">Productos</a>
+      <a href="carrito.html" class="flex items-center text-gray-700 hover:text-purple-600 py-1">
+        Carrito
+        <span id="mobile-cart-count" class="ml-2 bg-purple-600 text-white text-xs rounded-full px-2 py-1">0</span>
+      </a>
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Header cargado, verificando sesión...');
-    
-    // Verificar sesión al cargar la página
-    verificarSesion();
-    
-    // Event listeners para logout
-    setupLogoutListeners();
-    
-    // Setup menú móvil
-    setupMobileMenu();
-    
-    // Actualizar contador del carrito
-    actualizarContadorCarrito();
-});
+      <!-- Información de usuario móvil -->
+      <div id="mobile-user-info" class="hidden border-t pt-2">
+        <span id="mobile-welcome-message" class="block text-gray-700 py-1 font-medium bg-green-100 px-3 py-1 rounded"></span>
+        <button id="mobile-logout-btn" class="block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm mt-2">
+          Cerrar Sesión
+        </button>
+      </div>
 
-function verificarSesion() {
-    usuarioActivo = obtenerUsuarioActivo();
-    console.log('Usuario encontrado:', usuarioActivo);
-    
-    if (usuarioActivo) {
-        mostrarUsuarioLogueado(usuarioActivo);
-    } else {
-        mostrarLinksAuth();
-    }
-}
-
-function obtenerUsuarioActivo() {
-    try {
-        const usuarioString = localStorage.getItem('usuarioActivo');
-        if (usuarioString) {
-            const usuario = JSON.parse(usuarioString);
-            console.log('Usuario obtenido del localStorage:', usuario);
-            return usuario;
-        }
-        return null;
-    } catch (error) {
-        console.error('Error al obtener usuario activo:', error);
-        localStorage.removeItem('usuarioActivo');
-        return null;
-    }
-}
-
-function mostrarUsuarioLogueado(usuario) {
-    console.log('Mostrando usuario logueado:', usuario.nombre);
-    
-    // Elementos desktop
-    const userInfo = document.getElementById('user-info');
-    const authLinks = document.getElementById('auth-links');
-    const welcomeMessage = document.getElementById('welcome-message');
-    
-    // Elementos móvil
-    const mobileUserInfo = document.getElementById('mobile-user-info');
-    const mobileAuthLinks = document.getElementById('mobile-auth-links');
-    const mobileWelcomeMessage = document.getElementById('mobile-welcome-message');
-    
-    // Mostrar info de usuario en desktop
-    if (userInfo && authLinks && welcomeMessage) {
-        welcomeMessage.textContent = `Bienvenido, ${usuario.nombre}`;
-        userInfo.classList.remove('hidden');
-        userInfo.classList.add('flex');
-        authLinks.classList.add('hidden');
-        console.log('Usuario mostrado en desktop');
-    }
-    
-    // Mostrar info de usuario en móvil
-    if (mobileUserInfo && mobileAuthLinks && mobileWelcomeMessage) {
-        mobileWelcomeMessage.textContent = `Bienvenido, ${usuario.nombre}`;
-        mobileUserInfo.classList.remove('hidden');
-        mobileAuthLinks.classList.add('hidden');
-        console.log('Usuario mostrado en móvil');
-    }
-}
-
-function mostrarLinksAuth() {
-    console.log('Mostrando links de autenticación');
-    
-    // Elementos desktop
-    const userInfo = document.getElementById('user-info');
-    const authLinks = document.getElementById('auth-links');
-    
-    // Elementos móvil
-    const mobileUserInfo = document.getElementById('mobile-user-info');
-    const mobileAuthLinks = document.getElementById('mobile-auth-links');
-    
-    // Ocultar info de usuario y mostrar links de auth en desktop
-    if (userInfo && authLinks) {
-        userInfo.classList.add('hidden');
-        userInfo.classList.remove('flex');
-        authLinks.classList.remove('hidden');
-    }
-    
-    // Ocultar info de usuario y mostrar links de auth en móvil
-    if (mobileUserInfo && mobileAuthLinks) {
-        mobileUserInfo.classList.add('hidden');
-        mobileAuthLinks.classList.remove('hidden');
-    }
-}
-
-function setupLogoutListeners() {
-    const logoutBtn = document.getElementById('logout-btn');
-    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
-    
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', cerrarSesion);
-    }
-    
-    if (mobileLogoutBtn) {
-        mobileLogoutBtn.addEventListener('click', cerrarSesion);
-    }
-}
-
-function setupMobileMenu() {
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    
-    if (mobileMenuBtn && mobileMenu) {
-        mobileMenuBtn.addEventListener('click', function() {
-            mobileMenu.classList.toggle('hidden');
-        });
-    }
-}
-
-function cerrarSesion() {
-    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-        localStorage.removeItem('usuarioActivo');
-        alert('Sesión cerrada exitosamente');
-        
-        // Actualizar interfaz
-        verificarSesion();
-        
-        // Si no estás en la página principal, redirigir
-        const currentPath = window.location.pathname;
-        if (currentPath !== '/index.html' && 
-            currentPath !== '/' && 
-            !currentPath.endsWith('/')) {
-            window.location.href = 'index.html';
-        }
-    }
-}
-
-function actualizarContadorCarrito() {
-    const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-    const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
-    
-    const contadorDesktop = document.getElementById('contador-carrito');
-    const contadorMovil = document.getElementById('mobile-cart-count');
-    
-    if (contadorDesktop) {
-        contadorDesktop.textContent = totalItems;
-    }
-    
-    if (contadorMovil) {
-        contadorMovil.textContent = totalItems;
-    }
-}
-
-// Funciones globales para que otras páginas puedan usar
-window.actualizarHeader = function() {
-    verificarSesion();
-    actualizarContadorCarrito();
-};
-
-window.actualizarContadorCarrito = actualizarContadorCarrito;
-
-// Función global para cuando se guarde un usuario (llamar desde login)
-window.onUsuarioLogueado = function() {
-    console.log('Evento: usuario logueado, actualizando header...');
-    setTimeout(() => {
-        verificarSesion();
-    }, 100);
-};
-</script>
+      <!-- Enlaces móviles de login/registro -->
+      <div id="mobile-auth-links" class="border-t pt-2 space-y-1">
+        <a href="login.html" class="block text-gray-700 hover:text-purple-600 py-1">Iniciar Sesión</a>
+        <a href="registro.html" class="block text-gray-700 hover:text-purple-600 py-1">Registro</a>
+      </div>
+    </nav>
+  </div>

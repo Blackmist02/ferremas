@@ -20,20 +20,32 @@
   <div id="header"></div>
 
   <!-- HERO -->
-  <section class="relative bg-purple-700 text-white py-24 px-4 lg:px-16 overflow-hidden rounded-b-3xl shadow-lg">
-    <div class="max-w-6xl mx-auto text-center">
+  <section class="relative bg-[#005f6a] text-white py-24 px-6 lg:px-20 overflow-hidden rounded-b-3xl shadow-lg flex flex-col lg:flex-row items-center justify-between gap-12">
+    
+    <!-- Texto + CTA -->
+    <div class="max-w-xl text-center lg:text-left">
       <h1 class="text-4xl lg:text-6xl font-extrabold mb-6 drop-shadow-lg">
         ¡Todo para tu proyecto en un solo lugar!
       </h1>
-      <p class="text-lg lg:text-xl mb-10 text-purple-100">
-        Calidad, confianza y una gran variedad de herramientas y materiales en <strong>FerreMas</strong>.
+      <p class="text-lg lg:text-xl mb-10 text-[#d1d5db]">
+        Calidad, confianza y una gran variedad de herramientas y materiales en <strong class="text-red-600">FerreMas</strong>.
       </p>
       <a href="productos.html"
-        class="inline-block bg-white text-purple-700 hover:bg-purple-100 font-semibold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
+        class="inline-block bg-red-600 text-white font-semibold py-3 px-10 rounded-full text-lg shadow-lg hover:bg-red-700 hover:shadow-xl transition transform hover:scale-105">
         Ver Productos
       </a>
+      <p class="mt-6 text-[#f87171] font-semibold italic drop-shadow-md">
+        ¡Equípate con lo mejor y construye con confianza!
+      </p>
     </div>
-    <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-purple-700 to-transparent pointer-events-none"></div>
+
+    <!-- Imagen -->
+    <div class="max-w-md flex-shrink-0">
+      <img src="img/herramienta-destacada.png" alt="Herramienta destacada" class="rounded-2xl shadow-2xl drop-shadow-xl w-full object-contain" />
+    </div>
+
+    <!-- Fondo degradado sutil en la base -->
+    <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#005f6a] to-transparent pointer-events-none"></div>
   </section>
 
   <!-- PRODUCTOS DESTACADOS -->
@@ -51,7 +63,7 @@
     <div class="max-w-4xl mx-auto text-center px-4">
       <h3 class="text-2xl font-semibold text-gray-800 mb-4">¿Eres constructor o maestro ferretero?</h3>
       <p class="text-gray-600 mb-6">Regístrate en FerreMas para recibir descuentos especiales, ofertas y productos personalizados para tus proyectos.</p>
-      <a href="registro.html" class="bg-purple-600 hover:bg-purple-800 text-white px-6 py-3 rounded-full font-medium transition">
+      <a href="registro.html" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-medium transition">
         Crear Cuenta
       </a>
     </div>
