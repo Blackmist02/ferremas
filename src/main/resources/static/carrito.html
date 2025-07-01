@@ -14,7 +14,11 @@
     <main class="container mx-auto py-8 px-4">
         <h2 class="text-3xl font-bold mb-8 text-center text-teal-800">Carrito de Compras</h2>
         <div id="carrito-lista" class="bg-white rounded-lg shadow-md p-6 min-h-[200px]">
-            <!-- Contenido dinámico del carrito -->
+            <!-- Aquí se cargará dinámicamente el contenido del carrito -->
+            <div class="flex justify-center items-center py-8">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                <span class="ml-2 text-gray-600">Cargando carrito...</span>
+            </div>
         </div>
         <div class="mt-8 text-center">
             <a href="productos.html" 
@@ -27,6 +31,7 @@
     <div id="footer"></div>
 
     <script src="js/include-partials.js"></script>
+    <script src="js/session.js"></script>
     <script src="js/carrito.js"></script>
 </body>
 </html>

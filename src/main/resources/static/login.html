@@ -35,28 +35,37 @@
     </p>
   </div>
 
+  <script src="js/session.js"></script>
   <script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
 
-      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
-      const usuario = usuarios.find(u => u.email === email && u.password === password);
+      try {
+        const response = await fetch('/api/usuarios/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
 
-      if (!usuario) {
-        alert("Correo o contraseña incorrectos.");
-        return;
+        const data = await response.json();
+
+        if (data.success) {
+          // Guardar usuario en localStorage usando SessionManager
+          SessionManager.guardarSesion(data.usuario);
+          alert(`¡Bienvenido ${data.usuario.nombre}!`);
+          window.location.href = "index.html";
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error('Error al iniciar sesión:', error);
+        alert("Error al iniciar sesión. Por favor, inténtalo de nuevo.");
       }
-
-      localStorage.setItem('usuarioActivo', JSON.stringify({
-        nombre: usuario.nombre,
-        email: usuario.email
-      }));
-
-      alert(`¡Bienvenido ${usuario.nombre}!`);
-      window.location.href = "index.html";
     });
   </script>
 </body>

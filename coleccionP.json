@@ -1,12 +1,36 @@
 {
     "info": {
-        "name": "Ferremas API",
-        "description": "Colección de pruebas para las APIs de Ferremas",
-        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        "name": "Ferremas API - Colección Completa",
+        "description": "Colección completa de pruebas para todas las APIs de Ferremas - Actualizada 2025",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "version": "2.1.0"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8081",
+            "type": "string"
+        }
+    ],
+    "auth": {
+        "type": "basic",
+        "basic": [
+            {
+                "key": "username",
+                "value": "admin",
+                "type": "string"
+            },
+            {
+                "key": "password",
+                "value": "admin",
+                "type": "string"
+            }
+        ]
     },
     "item": [
         {
-            "name": "Usuarios",
+            "name": "👥 Usuarios",
+            "description": "Gestión de usuarios del sistema",
             "item": [
                 {
                     "name": "Listar Usuarios",
@@ -14,12 +38,13 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "http://localhost:8081/api/usuarios/usuario",
+                            "raw": "{{baseUrl}}/api/usuarios/usuario",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "usuarios", "usuario"]
-                        }
+                        },
+                        "description": "Obtiene la lista completa de usuarios registrados"
                     }
                 },
                 {
@@ -34,15 +59,16 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"nombre\": \"Juan\",\n    \"apellido\": \"Perez\",\n    \"run\": \"12345678-9\",\n    \"correo\": \"juan.perez@example.com\",\n    \"rol\": \"ADMIN\"\n}"
+                            "raw": "{\n    \"nombre\": \"Juan Carlos\",\n    \"apellido\": \"Perez Rodriguez\",\n    \"run\": \"12345678-9\",\n    \"correo\": \"juan.perez@ferremas.cl\",\n    \"password\": \"123456\",\n    \"rol\": \"ADMIN\"\n}"
                         },
                         "url": {
-                            "raw": "http://localhost:8081/api/usuarios/usuario",
+                            "raw": "{{baseUrl}}/api/usuarios/usuario",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "usuarios", "usuario"]
-                        }
+                        },
+                        "description": "Crea un nuevo usuario en el sistema"
                     }
                 },
                 {
@@ -57,21 +83,71 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "[\n    {\n        \"nombre\": \"Juan\",\n        \"apellido\": \"Perez\",\n        \"run\": \"12345678-9\",\n        \"correo\": \"juan.perez@example.com\",\n        \"rol\": \"ADMIN\"\n    },\n    {\n        \"nombre\": \"Maria\",\n        \"apellido\": \"Lopez\",\n        \"run\": \"98765432-1\",\n        \"correo\": \"maria.lopez@example.com\",\n        \"rol\": \"USER\"\n    }\n]"
+                            "raw": "[\n    {\n        \"nombre\": \"Juan Carlos\",\n        \"apellido\": \"Perez Rodriguez\",\n        \"run\": \"12345678-9\",\n        \"correo\": \"juan.perez@ferremas.cl\",\n        \"password\": \"123456\",\n        \"rol\": \"ADMIN\"\n    },\n    {\n        \"nombre\": \"Maria Elena\",\n        \"apellido\": \"Lopez Gonzalez\",\n        \"run\": \"98765432-1\",\n        \"correo\": \"maria.lopez@ferremas.cl\",\n        \"password\": \"123456\",\n        \"rol\": \"USER\"\n    },\n    {\n        \"nombre\": \"Carlos\",\n        \"apellido\": \"Martinez Silva\",\n        \"run\": \"11223344-5\",\n        \"correo\": \"carlos.martinez@ferremas.cl\",\n        \"password\": \"123456\",\n        \"rol\": \"VENDEDOR\"\n    }\n]"
                         },
                         "url": {
-                            "raw": "http://localhost:8081/api/usuarios/usuarios",
+                            "raw": "{{baseUrl}}/api/usuarios/usuarios",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "usuarios", "usuarios"]
-                        }
+                        },
+                        "description": "Crea múltiples usuarios de forma masiva"
+                    }
+                },
+                {
+                    "name": "🆕 Registro de Usuario",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nombre\": \"Ana García\",\n    \"email\": \"ana.garcia@email.com\",\n    \"password\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios/registro",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "usuarios", "registro"]
+                        },
+                        "description": "Registra un nuevo usuario desde el frontend"
+                    }
+                },
+                {
+                    "name": "🔐 Login de Usuario",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"ana.garcia@email.com\",\n    \"password\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios/login",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "usuarios", "login"]
+                        },
+                        "description": "Autentica un usuario y devuelve sus datos"
                     }
                 }
             ]
         },
         {
-            "name": "Sucursales",
+            "name": "🏪 Sucursales",
+            "description": "Gestión de sucursales de Ferremas",
             "item": [
                 {
                     "name": "Listar Sucursales",
@@ -79,12 +155,13 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "http://localhost:8081/api/suc/sucursal",
+                            "raw": "{{baseUrl}}/api/suc/sucursal",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "suc", "sucursal"]
-                        }
+                        },
+                        "description": "Obtiene todas las sucursales disponibles"
                     }
                 },
                 {
@@ -99,15 +176,16 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"nombre\": \"Sucursal Centro\",\n    \"direccion\": \"Av. Principal 123\"\n}"
+                            "raw": "{\n    \"nombre\": \"Ferremas Centro\",\n    \"direccion\": \"Av. Providencia 1234, Santiago Centro\"\n}"
                         },
                         "url": {
-                            "raw": "http://localhost:8081/api/suc/sucursal",
+                            "raw": "{{baseUrl}}/api/suc/sucursal",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "suc", "sucursal"]
-                        }
+                        },
+                        "description": "Crea una nueva sucursal"
                     }
                 },
                 {
@@ -122,21 +200,38 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "[\n    {\n        \"nombre\": \"Sucursal Centro\",\n        \"direccion\": \"Av. Principal 123\"\n    },\n    {\n        \"nombre\": \"Sucursal Norte\",\n        \"direccion\": \"Calle Norte 456\"\n    }\n]"
+                            "raw": "[\n    {\n        \"nombre\": \"Ferremas Centro\",\n        \"direccion\": \"Av. Providencia 1234, Santiago Centro\"\n    },\n    {\n        \"nombre\": \"Ferremas Las Condes\",\n        \"direccion\": \"Av. Apoquindo 4567, Las Condes\"\n    },\n    {\n        \"nombre\": \"Ferremas Maipú\",\n        \"direccion\": \"Av. Pajaritos 2890, Maipú\"\n    }\n]"
                         },
                         "url": {
-                            "raw": "http://localhost:8081/api/suc/sucursales",
+                            "raw": "{{baseUrl}}/api/suc/sucursales",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "suc", "sucursales"]
-                        }
+                        },
+                        "description": "Crea múltiples sucursales"
+                    }
+                },
+                {
+                    "name": "Eliminar Sucursal",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/suc/sucursal/1",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "suc", "sucursal", "1"]
+                        },
+                        "description": "Elimina una sucursal por ID"
                     }
                 }
             ]
         },
         {
-            "name": "Boletas",
+            "name": "🧾 Boletas",
+            "description": "Gestión de boletas y facturación",
             "item": [
                 {
                     "name": "Listar Boletas",
@@ -144,12 +239,13 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "http://localhost:8081/api/boleta/boleta",
+                            "raw": "{{baseUrl}}/api/boleta/boleta",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "boleta", "boleta"]
-                        }
+                        },
+                        "description": "Obtiene todas las boletas registradas"
                     }
                 },
                 {
@@ -164,15 +260,16 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"fecha\": \"2023-05-01\",\n    \"total\": 15000,\n    \"cliente\": \"Juan Perez\",\n    \"token\": \"abc123\"\n}"
+                            "raw": "{\n    \"fecha\": \"2025-06-23\",\n    \"total\": 25500,\n    \"cliente\": \"Juan Carlos Perez\",\n    \"token\": \"ferremas-abc123-2025\"\n}"
                         },
                         "url": {
-                            "raw": "http://localhost:8081/api/boleta/boletas",
+                            "raw": "{{baseUrl}}/api/boleta/boletas",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "boleta", "boletas"]
-                        }
+                        },
+                        "description": "Crea una nueva boleta"
                     }
                 },
                 {
@@ -187,21 +284,38 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "[\n    {\n        \"fecha\": \"2023-05-01\",\n        \"total\": 15000,\n        \"cliente\": \"Juan Perez\",\n        \"token\": \"abc123\"\n    },\n    {\n        \"fecha\": \"2023-05-02\",\n        \"total\": 20000,\n        \"cliente\": \"Maria Lopez\",\n        \"token\": \"def456\"\n    }\n]"
+                            "raw": "[\n    {\n        \"fecha\": \"2025-06-23\",\n        \"total\": 25500,\n        \"cliente\": \"Juan Carlos Perez\",\n        \"token\": \"ferremas-abc123-2025\"\n    },\n    {\n        \"fecha\": \"2025-06-23\",\n        \"total\": 45000,\n        \"cliente\": \"Maria Elena Lopez\",\n        \"token\": \"ferremas-def456-2025\"\n    },\n    {\n        \"fecha\": \"2025-06-22\",\n        \"total\": 12300,\n        \"cliente\": \"Carlos Martinez\",\n        \"token\": \"ferremas-ghi789-2025\"\n    }\n]"
                         },
                         "url": {
-                            "raw": "http://localhost:8081/api/boleta/lBoletas",
+                            "raw": "{{baseUrl}}/api/boleta/lBoletas",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "boleta", "lBoletas"]
-                        }
+                        },
+                        "description": "Crea múltiples boletas"
+                    }
+                },
+                {
+                    "name": "Eliminar Boleta",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/boleta/1",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "boleta", "1"]
+                        },
+                        "description": "Elimina una boleta por ID"
                     }
                 }
             ]
         },
         {
-            "name": "Productos",
+            "name": "🔨 Productos",
+            "description": "Gestión del catálogo de productos",
             "item": [
                 {
                     "name": "Listar Productos",
@@ -209,12 +323,13 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "http://localhost:8081/api/productos/producto",
+                            "raw": "{{baseUrl}}/api/productos/producto",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "productos", "producto"]
-                        }
+                        },
+                        "description": "Obtiene todos los productos del catálogo"
                     }
                 },
                 {
@@ -229,15 +344,16 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"codigoProducto\": \"HM001\",\n    \"marca\": \"GolpeMaster\",\n    \"codigo\": \"001\",\n    \"nombre\": \"Martillo de Carpintero\",\n    \"modelo\": \"CarpinteroPro\",\n    \"stock\": 50,\n    \"precios\": [\n        {\n            \"fecha\": \"2023-05-01\",\n            \"valor\": 15000\n        }\n    ]\n}"
+                            "raw": "{\n    \"codigoProducto\": \"FER-HM001\",\n    \"marca\": \"Stanley\",\n    \"codigo\": \"HM001\",\n    \"nombre\": \"Martillo de Carpintero 16oz\",\n    \"modelo\": \"ProCarpenter-16\",\n    \"stock\": 50,\n    \"precios\": [\n        {\n            \"fecha\": \"2025-01-15\",\n            \"valor\": 18500\n        }\n    ]\n}"
                         },
                         "url": {
-                            "raw": "http://localhost:8081/api/productos/producto",
+                            "raw": "{{baseUrl}}/api/productos/producto",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "productos", "producto"]
-                        }
+                        },
+                        "description": "Crea un nuevo producto en el catálogo"
                     }
                 },
                 {
@@ -252,15 +368,16 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "[\n    {\n        \"codigoProducto\": \"HM001\",\n        \"marca\": \"GolpeMaster\",\n        \"codigo\": \"001\",\n        \"nombre\": \"Martillo de Carpintero\",\n        \"modelo\": \"CarpinteroPro\",\n        \"stock\": 50,\n        \"precios\": [\n            {\n                \"fecha\": \"2023-05-01\",\n                \"valor\": 15000\n            }\n        ]\n    },\n    {\n        \"codigoProducto\": \"HM002\",\n        \"marca\": \"GolpeMaster\",\n        \"codigo\": \"002\",\n        \"nombre\": \"Martillo de Bola\",\n        \"modelo\": \"BolaMax\",\n        \"stock\": 30,\n        \"precios\": [\n            {\n                \"fecha\": \"2023-05-01\",\n                \"valor\": 18000\n            }\n        ]\n    }\n]"
+                            "raw": "[\n    {\n        \"codigoProducto\": \"FER-HM001\",\n        \"marca\": \"Stanley\",\n        \"codigo\": \"HM001\",\n        \"nombre\": \"Martillo de Carpintero 16oz\",\n        \"modelo\": \"ProCarpenter-16\",\n        \"stock\": 50,\n        \"precios\": [\n            {\n                \"fecha\": \"2025-01-15\",\n                \"valor\": 18500\n            }\n        ]\n    },\n    {\n        \"codigoProducto\": \"FER-HM002\",\n        \"marca\": \"Stanley\",\n        \"codigo\": \"HM002\",\n        \"nombre\": \"Martillo de Bola 20oz\",\n        \"modelo\": \"BallPeen-20\",\n        \"stock\": 30,\n        \"precios\": [\n            {\n                \"fecha\": \"2025-01-15\",\n                \"valor\": 22000\n            }\n        ]\n    },\n    {\n        \"codigoProducto\": \"FER-TD001\",\n        \"marca\": \"DeWalt\",\n        \"codigo\": \"TD001\",\n        \"nombre\": \"Taladro Inalámbrico 18V\",\n        \"modelo\": \"DCD771C2\",\n        \"stock\": 15,\n        \"precios\": [\n            {\n                \"fecha\": \"2025-01-15\",\n                \"valor\": 89900\n            }\n        ]\n    }\n]"
                         },
                         "url": {
-                            "raw": "http://localhost:8081/api/productos/productos",
+                            "raw": "{{baseUrl}}/api/productos/productos",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "productos", "productos"]
-                        }
+                        },
+                        "description": "Crea múltiples productos de forma masiva"
                     }
                 },
                 {
@@ -275,15 +392,104 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "[\n    {\n        \"fecha\": \"2023-06-01\",\n        \"valor\": 16000\n    },\n    {\n        \"fecha\": \"2023-07-01\",\n        \"valor\": 17000\n    }\n]"
+                            "raw": "[\n    {\n        \"fecha\": \"2025-01-20\",\n        \"valor\": 19000\n    },\n    {\n        \"fecha\": \"2025-01-25\",\n        \"valor\": 19500\n    }\n]"
                         },
                         "url": {
-                            "raw": "http://localhost:8081/api/productos/producto/1/precios",
+                            "raw": "{{baseUrl}}/api/productos/producto/1/precios",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "8081",
                             "path": ["api", "productos", "producto", "1", "precios"]
-                        }
+                        },
+                        "description": "Agrega nuevos precios históricos a un producto existente"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "💳 Webpay",
+            "description": "Integración con sistema de pagos Transbank",
+            "item": [
+                {
+                    "name": "Crear Transacción Webpay",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"amount\": 25500.0\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/webpay/create",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "webpay", "create"]
+                        },
+                        "description": "Inicia una nueva transacción Webpay con Transbank"
+                    }
+                },
+                {
+                    "name": "Confirmar Transacción (GET)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/webpay/commit?token_ws=TOKEN_EXAMPLE",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "webpay", "commit"],
+                            "query": [
+                                {
+                                    "key": "token_ws",
+                                    "value": "TOKEN_EXAMPLE",
+                                    "description": "Token devuelto por Transbank"
+                                }
+                            ]
+                        },
+                        "description": "Endpoint al que redirige Transbank después del pago"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "💱 Divisas",
+            "description": "Consulta de tipos de cambio del Banco Central",
+            "item": [
+                {
+                    "name": "🆕 Obtener Tasas de Cambio",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/divisas/tasas",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "divisas", "tasas"]
+                        },
+                        "description": "Obtiene las tasas de cambio optimizadas para el carrito (CLP, USD, EUR)"
+                    }
+                },
+                {
+                    "name": "Obtener Divisas Principales",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/divisas/principales",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "8081",
+                            "path": ["api", "divisas", "principales"]
+                        },
+                        "description": "Obtiene las divisas principales (USD, EUR) con detalles completos"
                     }
                 }
             ]

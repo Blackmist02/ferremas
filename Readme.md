@@ -91,3 +91,13 @@ La clase `FerremasApplicationTests` incluye pruebas unitarias para verificar que
 2. Configurar la base de datos MySQL y actualizar las credenciales en `application.properties`.
 3. Ejecutar el comando `mvn spring-boot:run` para iniciar la aplicación.
 4. Acceder a la aplicación en `http://localhost:8081`.
+
+
+
+datos trajeta 
+4051885600446623 
+123
+06 26
+
+11.111.111-1
+123

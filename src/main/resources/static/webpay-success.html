@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Exitoso - FerreMas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div id="header"></div>
+    
+    <main class="container mx-auto py-16 text-center">
+        <div class="bg-white rounded-lg shadow-md p-8 max-w-md mx-auto">
+            <div class="text-green-600 mb-4">
+                <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-green-600 mb-4">¡Pago Exitoso!</h2>
+            <p class="text-gray-600 mb-6">Tu compra ha sido procesada correctamente.</p>
+            <div id="transaction-details" class="mb-6 text-left"></div>
+            <div class="space-y-3">
+                <a href="productos.html" class="block bg-purple-600 hover:bg-purple-800 text-white px-6 py-3 rounded-lg transition">
+                    Seguir Comprando
+                </a>
+                <a href="index.html" class="block bg-gray-500 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition">
+                    Volver al Inicio
+                </a>
+            </div>
+        </div>
+    </main>
+    
+    <div id="footer"></div>
+    <script src="js/include-partials.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/productos.js"></script>
+    <script>
+        // Limpiar carrito después de compra exitosa
+        localStorage.removeItem('carrito');
+        
+        // Obtener parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        
+        if (token) {
+            document.getElementById('transaction-details').innerHTML = `
+                <p class="text-sm text-gray-600">Token de transacción: <span class="font-mono">${token}</span></p>
+            `;
+        }
+    </script>
+</body>
+</html>
