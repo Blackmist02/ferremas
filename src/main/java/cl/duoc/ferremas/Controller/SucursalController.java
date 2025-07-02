@@ -15,14 +15,14 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/suc")
+@RequestMapping("/api/sucursales")
 public class SucursalController {
-
+    
     @Autowired
     private SucursalService sucursalService;
 
-    @GetMapping("/sucursal")
-    public ResponseEntity<List<Sucursal>> listar() {
+    @GetMapping
+    public ResponseEntity<List<Sucursal>> listarSucursales() {
         List<Sucursal> sucursales = sucursalService.findAll();
         if (sucursales.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -30,26 +30,26 @@ public class SucursalController {
         return ResponseEntity.ok(sucursales);
     }
 
-    @PostMapping("/sucursal")
+    @PostMapping
     public ResponseEntity<Sucursal> guardar(@RequestBody Sucursal sucursal) {
         Sucursal nuevaSucursal = sucursalService.save(sucursal);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaSucursal);
     }
 
-    @PostMapping("/sucursales")
+    @PostMapping("/lista")
     public ResponseEntity<List<Sucursal>> guardarLista(@RequestBody List<Sucursal> sucursales) {
         List<Sucursal> nuevasSucursales = sucursalService.saveAll(sucursales);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevasSucursales);
     }
 
-    @DeleteMapping("/sucursal/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         sucursalService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     /*
-    @PatchMapping("/sucursal/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Sucursal> actualizar(@PathVariable Long id, @RequestBody Sucursal sucursal) {
         Sucursal sucursalActualizada = sucursalService.update(id, sucursal);
         return ResponseEntity.ok(sucursalActualizada);
