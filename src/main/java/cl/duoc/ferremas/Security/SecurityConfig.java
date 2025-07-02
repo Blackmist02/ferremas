@@ -37,14 +37,14 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
-                // Permitir acceso público a páginas web
+                // Permitir acceso público a páginas web estáticas
                 .requestMatchers("/", "/index.html", "/productos.html", "/carrito.html", "/productoInd.html").permitAll()
                 .requestMatchers("/login.html", "/registro.html").permitAll()
                 .requestMatchers("/webpay-success.html", "/webpay-failure.html").permitAll()
                 
-                // Permitir acceso a recursos estáticos
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/partials/**").permitAll()
-                .requestMatchers("/favicon.ico").permitAll()
+                // Permitir acceso a recursos estáticos (CSS, JS, imágenes, etc.)
+                .requestMatchers("/css/**", "/js/**", "/img/**", "/images/**", "/partials/**").permitAll()
+                .requestMatchers("/favicon.ico", "/robots.txt").permitAll()
                 
                 // APIs públicas (sin autenticación)
                 .requestMatchers("/api/usuarios/registro", "/api/usuarios/login").permitAll()
@@ -57,8 +57,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/suc/**").hasRole("ADMIN")
                 .requestMatchers("/api/boleta/**").hasRole("ADMIN")
                 
-                // Cualquier otra petición requiere autenticación
-                .anyRequest().authenticated()
+                // Permitir cualquier otra petición (páginas públicas por defecto)
+                .anyRequest().permitAll()
             )
             .httpBasic(httpBasic -> {
                 httpBasic.realmName("Ferremas Admin API");
