@@ -50,4 +50,9 @@ public class ProductoServiceImpl implements ProductoService {
     public Productos findByCodigoProducto(String codigoProducto) {
         return productoRepository.findByCodigoProducto(codigoProducto);
     }
+    
+    @Override
+    public long countAll() {
+        return productoRepository.count();
+    }
 }

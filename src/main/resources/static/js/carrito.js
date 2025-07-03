@@ -536,12 +536,54 @@ function renderizarCarritoCompleto(carrito, productos, contenedor, idsFaltantes 
             </div>
         ` : ''}
         
+        ${(() => {
+            const usuario = SessionManager?.obtenerUsuarioActivo();
+            if (!usuario) {
+                return `
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-orange-800 font-semibold">🔒 Inicia sesión para continuar</p>
+                                <p class="text-orange-700 text-sm">Necesitas una cuenta para realizar compras</p>
+                            </div>
+                            <a href="login.html" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition">
+                                Iniciar sesión
+                            </a>
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                        <p class="text-green-800 text-sm">
+                            ✅ Conectado como <strong>${usuario.nombre}</strong> (${usuario.correo})
+                        </p>
+                    </div>
+                `;
+            }
+        })()}
+        
         <button onclick="procesarCompraRapido(${total})" 
-                class="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-lg font-bold text-lg transition transform hover:scale-105 ${idsFaltantes.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}"
-                ${idsFaltantes.length > 0 ? 'disabled' : ''}>
-                🛒 ${idsFaltantes.length > 0 ? 'Productos no disponibles' : 'Pagar con Webpay'}
+                class="w-full py-4 rounded-lg font-bold text-lg transition transform hover:scale-105 ${
+                    idsFaltantes.length > 0 || !SessionManager?.obtenerUsuarioActivo() 
+                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed opacity-50' 
+                        : 'bg-green-500 hover:bg-green-600 text-white'
+                }"
+                ${idsFaltantes.length > 0 || !SessionManager?.obtenerUsuarioActivo() ? 'disabled' : ''}>
+                🛒 ${
+                    idsFaltantes.length > 0 
+                        ? 'Productos no disponibles' 
+                        : !SessionManager?.obtenerUsuarioActivo()
+                            ? 'Inicia sesión para comprar'
+                            : 'Pagar con Webpay'
+                }
         </button>
-        <p class="text-xs text-gray-500 text-center mt-2">El pago se procesará en pesos chilenos (CLP)</p>
+        <p class="text-xs text-gray-500 text-center mt-2">
+            ${SessionManager?.obtenerUsuarioActivo() 
+                ? 'El pago se procesará en pesos chilenos (CLP)' 
+                : 'Debes iniciar sesión para realizar compras'
+            }
+        </p>
     `;
     fragment.appendChild(totalDiv);
     
@@ -622,6 +664,18 @@ function eliminarDelCarrito(id) {
 
 // ✅ Proceso de compra ultra optimizado
 async function procesarCompraRapido(total) {
+    // ✅ Verificar autenticación PRIMERO
+    const usuario = SessionManager?.obtenerUsuarioActivo();
+    if (!usuario) {
+        mostrarNotificacionRapida('Debes iniciar sesión para realizar una compra', 'warning');
+        setTimeout(() => {
+            if (confirm('¿Deseas ir a la página de login?')) {
+                window.location.href = 'login.html';
+            }
+        }, 1000);
+        return;
+    }
+
     if (total <= 0) {
         mostrarNotificacionRapida('El carrito está vacío', 'warning');
         return;
