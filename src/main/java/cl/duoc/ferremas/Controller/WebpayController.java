@@ -50,26 +50,65 @@ public class WebpayController {
 
     /**
      * Endpoint al que Transbank redirige al usuario después de la transacción.
-     * Recibe el token de Webpay y confirma la transacción.
+     * Maneja tanto transacciones exitosas/fallidas como cancelaciones.
      *
-     * @param tokenWs El token que Transbank envía como parámetro de URL.
-     * @return Redirige al usuario a una página de éxito o fracaso en tu frontend.
+     * @param tokenWs El token que Transbank envía cuando la transacción se procesa
+     * @param tbkToken El token que Transbank envía cuando el usuario cancela
+     * @param tbkOrdenCompra La orden de compra cuando el usuario cancela
+     * @param tbkIdSesion El ID de sesión cuando el usuario cancela
+     * @return Redirige al usuario a una página de éxito, fracaso o cancelación
      */
     @GetMapping("/commit")
-    public RedirectView commitWebpayTransaction(@RequestParam("token_ws") String tokenWs) {
+    public RedirectView commitWebpayTransaction(
+            @RequestParam(value = "token_ws", required = false) String tokenWs,
+            @RequestParam(value = "TBK_TOKEN", required = false) String tbkToken,
+            @RequestParam(value = "TBK_ORDEN_COMPRA", required = false) String tbkOrdenCompra,
+            @RequestParam(value = "TBK_ID_SESION", required = false) String tbkIdSesion) {
+        
         try {
-            Map<String, Object> commitResult = webpayService.commitTransaction(tokenWs);
-
-            if (commitResult != null && "AUTHORIZED".equals(commitResult.get("status")) &&
-                Integer.valueOf(0).equals(commitResult.get("response_code"))) {
-                // Transacción exitosa - Redirigir con ruta absoluta
-                return new RedirectView("/webpay-success.html?token=" + tokenWs);
-            } else {
-                // Transacción fallida - Redirigir con ruta absoluta
-                return new RedirectView("/webpay-failure.html?token=" + tokenWs + "&error=" + commitResult.getOrDefault("response_code", "unknown"));
+            // 🚫 CASO 1: Usuario canceló desde Transbank (parámetros TBK_*)
+            if (tbkToken != null && tbkOrdenCompra != null && tbkIdSesion != null) {
+                System.out.println("🚫 Usuario canceló desde Transbank:");
+                System.out.println("   - TBK_TOKEN: " + tbkToken);
+                System.out.println("   - TBK_ORDEN_COMPRA: " + tbkOrdenCompra);
+                System.out.println("   - TBK_ID_SESION: " + tbkIdSesion);
+                
+                // Redirigir a página de cancelación con información
+                return new RedirectView("/webpay-cancel.html?source=transbank&orden=" + tbkOrdenCompra + "&sesion=" + tbkIdSesion);
             }
+            
+            // ✅ CASO 2: Transacción procesada (token_ws presente)
+            if (tokenWs != null && !tokenWs.trim().isEmpty()) {
+                System.out.println("💳 Procesando transacción con token: " + tokenWs);
+                
+                Map<String, Object> commitResult = webpayService.commitTransaction(tokenWs);
+
+                if (commitResult != null && "AUTHORIZED".equals(commitResult.get("status")) &&
+                    Integer.valueOf(0).equals(commitResult.get("response_code"))) {
+                    // Transacción exitosa
+                    System.out.println("✅ Transacción autorizada exitosamente");
+                    return new RedirectView("/webpay-success.html?token=" + tokenWs);
+                } else {
+                    // Transacción fallida
+                    System.out.println("❌ Transacción fallida: " + commitResult.getOrDefault("response_code", "unknown"));
+                    return new RedirectView("/webpay-failure.html?token=" + tokenWs + "&error=" + commitResult.getOrDefault("response_code", "unknown"));
+                }
+            }
+            
+            // ⚠️ CASO 3: Sin parámetros válidos
+            System.out.println("⚠️ Commit sin parámetros válidos - posible error");
+            return new RedirectView("/webpay-failure.html?error=no_valid_parameters");
+            
         } catch (RuntimeException e) {
-            // Error en el procesamiento - Redirigir con ruta absoluta
+            System.err.println("❌ Error en el procesamiento de commit: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Si hay información de cancelación, redirigir a cancelación
+            if (tbkToken != null) {
+                return new RedirectView("/webpay-cancel.html?source=transbank&error=" + e.getMessage());
+            }
+            
+            // Error general
             return new RedirectView("/webpay-failure.html?error=" + e.getMessage());
         }
     }
@@ -90,6 +129,61 @@ public class WebpayController {
             this.amount = amount;
         }
         // Agrega getters y setters para otros campos
+    }
+
+    /**
+     * Endpoint para cancelar una transacción Webpay.
+     * El usuario puede acceder a esta URL para cancelar el pago antes de completarlo.
+     * 
+     * @param token El token opcional de la transacción a cancelar
+     * @return Redirige a la página de cancelación
+     */
+    @GetMapping("/cancel")
+    public RedirectView cancelWebpayTransaction(@RequestParam(value = "token", required = false) String token) {
+        // Registrar la cancelación (opcional - para logs/auditoría)
+        try {
+            if (token != null && !token.isEmpty()) {
+                // Si hay un token, podrías intentar anular la transacción
+                // webpayService.cancelTransaction(token); // Implementar si es necesario
+                System.out.println("🚫 Usuario canceló transacción con token: " + token);
+            } else {
+                System.out.println("🚫 Usuario canceló transacción sin token");
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️ Error al procesar cancelación: " + e.getMessage());
+        }
+        
+        // Redirigir a la página de cancelación
+        return new RedirectView("/webpay-cancel.html" + (token != null ? "?token=" + token : ""));
+    }
+
+    /**
+     * Endpoint API para cancelar desde JavaScript
+     * @param requestBody Datos de la cancelación
+     * @return Respuesta JSON
+     */
+    @PostMapping("/cancel")
+    public ResponseEntity<Map<String, String>> cancelWebpayTransactionAPI(@RequestBody(required = false) Map<String, String> requestBody) {
+        try {
+            String token = requestBody != null ? requestBody.get("token") : null;
+            String reason = requestBody != null ? requestBody.get("reason") : "Usuario canceló";
+            
+            if (token != null && !token.isEmpty()) {
+                System.out.println("🚫 API: Usuario canceló transacción con token: " + token + " - Razón: " + reason);
+            } else {
+                System.out.println("🚫 API: Usuario canceló transacción - Razón: " + reason);
+            }
+            
+            return ResponseEntity.ok(Map.of(
+                "status", "cancelled",
+                "message", "Transacción cancelada exitosamente"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "error", "Error al cancelar la transacción",
+                "details", e.getMessage()
+            ));
+        }
     }
 
     // Opcional: Si Transbank redirige por POST, puedes usar un @PostMapping

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Cancelado - FerreMas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ferremas-orange': '#FF6B35',
+                        'ferremas-dark': '#2C3E50'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div id="header"></div>
+    
+    <main class="container mx-auto py-16 text-center">
+        <div class="bg-white rounded-lg shadow-md p-8 max-w-md mx-auto">
+            <!-- Icono de cancelación -->
+            <div class="text-yellow-500 mb-4">
+                <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.314 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+            </div>
+            
+            <h2 id="cancel-title" class="text-2xl font-bold text-yellow-600 mb-4">Pago Cancelado</h2>
+            <p id="cancel-message" class="text-gray-600 mb-6">Has cancelado el proceso de pago. No se ha realizado ningún cargo a tu tarjeta.</p>
+            
+            <!-- Información de la transacción (si hay datos) -->
+            <div id="transaction-info" class="bg-gray-50 rounded p-4 mb-6 hidden">
+                <h3 class="font-semibold text-gray-700 mb-2">Información de la transacción:</h3>
+                <div id="token-info" class="hidden">
+                    <p class="text-sm text-gray-600">Token: <span id="token-display" class="font-mono"></span></p>
+                </div>
+                <div id="transbank-info" class="hidden">
+                    <p class="text-sm text-gray-600">Orden de Compra: <span id="orden-display" class="font-mono"></span></p>
+                    <p class="text-sm text-gray-600">Sesión: <span id="sesion-display" class="font-mono"></span></p>
+                    <p class="text-sm text-yellow-600 font-semibold mt-2">🏦 Cancelado desde el sitio de Transbank</p>
+                </div>
+                <p class="text-sm text-gray-500 mt-1">Fecha: <span id="cancel-date"></span></p>
+            </div>
+            
+            <!-- Razones de cancelación -->
+            <div class="text-left mb-6">
+                <h3 class="font-semibold text-gray-700 mb-3 text-center">¿Por qué cancelaste el pago?</h3>
+                <div class="space-y-2">
+                    <label class="flex items-center">
+                        <input type="radio" name="reason" value="changed_mind" class="mr-2">
+                        <span class="text-sm">Cambié de opinión</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="reason" value="payment_issues" class="mr-2">
+                        <span class="text-sm">Problemas con el método de pago</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="reason" value="wrong_amount" class="mr-2">
+                        <span class="text-sm">Monto incorrecto</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="reason" value="security_concerns" class="mr-2">
+                        <span class="text-sm">Preocupaciones de seguridad</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="reason" value="other" class="mr-2">
+                        <span class="text-sm">Otro motivo</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Botones de acción principales -->
+            <div class="space-y-3">
+                <button onclick="continuarCompra()" class="w-full bg-ferremas-orange text-white py-3 px-6 rounded font-semibold hover:bg-orange-600 transition duration-300">
+                    🛍️ Continuar Compra
+                </button>
+                
+                <button onclick="abandonarCompra()" class="w-full bg-red-500 text-white py-3 px-6 rounded font-semibold hover:bg-red-600 transition duration-300">
+                    🗑️ Abandonar Compra
+                </button>
+                
+                <button onclick="irAInicio()" class="w-full bg-white text-ferremas-orange border-2 border-ferremas-orange py-3 px-6 rounded font-semibold hover:bg-ferremas-orange hover:text-white transition duration-300">
+                    🏠 Ir a Inicio
+                </button>
+            </div>
+            
+            <!-- Información del carrito -->
+            <div id="cart-status" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded hidden">
+                <p class="text-sm text-blue-800">
+                    <span id="cart-info">Verificando estado del carrito...</span>
+                </p>
+            </div>
+            
+            <!-- Información adicional -->
+            <div class="mt-8 text-xs text-gray-500 border-t pt-4">
+                <p class="mb-2">💡 <strong>¿Necesitas ayuda?</strong></p>
+                <p>Si experimentaste problemas técnicos, por favor contacta nuestro soporte.</p>
+                <p class="mt-2">📞 Teléfono: +56 2 1234 5678</p>
+                <p>📧 Email: soporte@ferremas.com</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <!-- Scripts -->
+    <script src="js/include-partials.js"></script>
+    <script>
+        // Obtener parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const source = urlParams.get('source');
+        const orden = urlParams.get('orden');
+        const sesion = urlParams.get('sesion');
+        const error = urlParams.get('error');
+        
+        // Configurar la página según el tipo de cancelación
+        if (source === 'transbank') {
+            // Cancelación desde Transbank
+            document.getElementById('cancel-title').textContent = 'Pago Cancelado desde Transbank';
+            document.getElementById('cancel-message').textContent = 'Cancelaste el pago desde el sitio web de Transbank. No se ha realizado ningún cargo a tu tarjeta.';
+            
+            if (orden || sesion) {
+                document.getElementById('transaction-info').classList.remove('hidden');
+                document.getElementById('transbank-info').classList.remove('hidden');
+                
+                if (orden) {
+                    document.getElementById('orden-display').textContent = orden;
+                }
+                if (sesion) {
+                    document.getElementById('sesion-display').textContent = sesion;
+                }
+                document.getElementById('cancel-date').textContent = new Date().toLocaleString('es-CL');
+            }
+        } else if (token) {
+            // Cancelación con token regular
+            document.getElementById('transaction-info').classList.remove('hidden');
+            document.getElementById('token-info').classList.remove('hidden');
+            document.getElementById('token-display').textContent = token.substring(0, 20) + '...';
+            document.getElementById('cancel-date').textContent = new Date().toLocaleString('es-CL');
+        } else if (source === 'carrito') {
+            // Cancelación desde el carrito
+            document.getElementById('cancel-title').textContent = 'Proceso de Compra Cancelado';
+            document.getElementById('cancel-message').textContent = 'Has cancelado el proceso de compra desde el carrito. Tus productos siguen disponibles.';
+        }
+        
+        // Mostrar error si existe
+        if (error) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'bg-red-50 border border-red-200 rounded p-3 mb-4';
+            errorDiv.innerHTML = `<p class="text-red-800 text-sm">⚠️ Error: ${error}</p>`;
+            document.querySelector('.bg-white').insertBefore(errorDiv, document.querySelector('.bg-white').firstChild);
+        }
+        
+        // Configurar interfaz según el estado del carrito
+        configurarInterfazCarrito();
+        
+        // Enviar razón de cancelación cuando se selecciona
+        document.querySelectorAll('input[name="reason"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    sendCancellationReason(this.value);
+                }
+            });
+        });
+        
+        // Configurar interfaz según el carrito
+        function configurarInterfazCarrito() {
+            const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+            const cartStatus = document.getElementById('cart-status');
+            const cartInfo = document.getElementById('cart-info');
+            
+            if (carrito.length > 0) {
+                // Hay productos en el carrito
+                cartStatus.classList.remove('hidden');
+                cartInfo.textContent = `Tienes ${carrito.length} producto(s) en tu carrito.`;
+            } else {
+                // Carrito vacío
+                cartInfo.textContent = 'Tu carrito está vacío.';
+            }
+        }
+        
+        // Funciones de navegación
+        function continuarCompra() {
+            console.log('🛍️ Usuario eligió continuar compra - manteniendo carrito');
+            // El carrito se mantiene intacto
+            sendCancellationReason('continue_shopping_keep_cart');
+            window.location.href = '/productos.html';
+        }
+        
+        function abandonarCompra() {
+            console.log('🗑️ Usuario eligió abandonar compra - limpiando carrito');
+            // Limpiar carrito completamente
+            localStorage.removeItem('carrito');
+            localStorage.removeItem('carritoTemporal');
+            sendCancellationReason('abandon_purchase_clear_cart');
+            window.location.href = '/productos.html';
+        }
+        
+        function irAInicio() {
+            console.log('🏠 Usuario fue al inicio - manteniendo carrito');
+            // El carrito se mantiene intacto
+            sendCancellationReason('go_home_keep_cart');
+            window.location.href = '/index.html';
+        }
+        
+        // Enviar razón de cancelación al servidor
+        async function sendCancellationReason(reason) {
+            try {
+                const cancellationData = {
+                    reason: reason,
+                    timestamp: new Date().toISOString(),
+                    source: source || 'unknown'
+                };
+                
+                // Agregar información específica según el tipo
+                if (token) {
+                    cancellationData.token = token;
+                }
+                if (orden) {
+                    cancellationData.tbk_orden_compra = orden;
+                }
+                if (sesion) {
+                    cancellationData.tbk_id_sesion = sesion;
+                }
+                
+                const response = await fetch('/api/webpay/cancel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(cancellationData)
+                });
+                
+                if (response.ok) {
+                    console.log('✅ Razón de cancelación enviada:', reason);
+                } else {
+                    console.warn('⚠️ Error al enviar razón de cancelación');
+                }
+            } catch (error) {
+                console.error('❌ Error al enviar razón de cancelación:', error);
+            }
+        }
+        
+        // Registrar la cancelación al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enviar evento de cancelación automáticamente según el origen
+            let autoReason = 'user_cancelled';
+            
+            if (source === 'transbank') {
+                autoReason = 'cancelled_from_transbank';
+            } else if (source === 'carrito') {
+                autoReason = 'cancelled_from_cart';
+            }
+            
+            sendCancellationReason(autoReason);
+            
+            console.log('📄 Página de cancelación de Webpay cargada');
+            console.log('🛒 Estado del carrito verificado');
+        });
+    </script>
+</body>
+</html>
