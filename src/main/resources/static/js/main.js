@@ -104,9 +104,9 @@ async function cargarProductosDestacados() {
 
 // ✅ Renderizar productos destacados optimizado
 function renderizarProductosDestacados(productos) {
-    const container = document.getElementById('productos-destacados');
+    const container = document.getElementById('destacados'); // ✅ Corregido: usar 'destacados' en lugar de 'productos-destacados'
     if (!container) {
-        console.warn('⚠️ Contenedor productos-destacados no encontrado');
+        console.warn('⚠️ Contenedor destacados no encontrado');
         return;
     }
     

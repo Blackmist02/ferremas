@@ -7,6 +7,9 @@ let divisasCache = null;
 let cacheTimestamp = 0;
 const CACHE_TTL = 3 * 60 * 1000; // 3 minutos
 
+// ✅ Variable global para almacenar el usuario actual
+let usuarioActual = null;
+
 // ✅ Pre-carga optimizada
 document.addEventListener('DOMContentLoaded', async () => {
     const yearSpan = document.getElementById('currentYear');
@@ -22,10 +25,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('🛒 Cargando página del carrito...');
     mostrarLoadingCarrito(true);
     
-    // Verificar usuario logueado
-    const usuario = SessionManager?.obtenerUsuarioActivo();
-    if (usuario) {
-        console.log('Usuario logueado:', usuario.nombre);
+    // Verificar usuario logueado y almacenar globalmente
+    usuarioActual = await obtenerUsuarioActivo();
+    if (usuarioActual) {
+        console.log('Usuario logueado:', usuarioActual.nombre);
     }
     
     try {
@@ -537,8 +540,7 @@ function renderizarCarritoCompleto(carrito, productos, contenedor, idsFaltantes 
         ` : ''}
         
         ${(() => {
-            const usuario = SessionManager?.obtenerUsuarioActivo();
-            if (!usuario) {
+            if (!usuarioActual) {
                 return `
                     <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
                         <div class="flex items-center justify-between">
@@ -556,7 +558,7 @@ function renderizarCarritoCompleto(carrito, productos, contenedor, idsFaltantes 
                 return `
                     <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
                         <p class="text-green-800 text-sm">
-                            ✅ Conectado como <strong>${usuario.nombre}</strong> (${usuario.correo})
+                            ✅ Conectado como <strong>${usuarioActual.nombre}</strong> (${usuarioActual.correo})
                         </p>
                     </div>
                 `;
@@ -567,15 +569,15 @@ function renderizarCarritoCompleto(carrito, productos, contenedor, idsFaltantes 
         <div class="space-y-3">
             <button onclick="procesarCompraRapido(${total})" 
                     class="w-full py-4 rounded-lg font-bold text-lg transition transform hover:scale-105 ${
-                        idsFaltantes.length > 0 || !SessionManager?.obtenerUsuarioActivo() 
+                        idsFaltantes.length > 0 || !usuarioActual 
                             ? 'bg-gray-400 text-gray-600 cursor-not-allowed opacity-50' 
                             : 'bg-green-500 hover:bg-green-600 text-white'
                     }"
-                    ${idsFaltantes.length > 0 || !SessionManager?.obtenerUsuarioActivo() ? 'disabled' : ''}>
+                    ${idsFaltantes.length > 0 || !usuarioActual ? 'disabled' : ''}>
                     🛒 ${
                         idsFaltantes.length > 0 
                             ? 'Productos no disponibles' 
-                            : !SessionManager?.obtenerUsuarioActivo()
+                            : !usuarioActual
                                 ? 'Inicia sesión para comprar'
                                 : 'Pagar con Webpay'
                     }
@@ -596,7 +598,7 @@ function renderizarCarritoCompleto(carrito, productos, contenedor, idsFaltantes 
         </div>
         
         <p class="text-xs text-gray-500 text-center mt-2">
-            ${SessionManager?.obtenerUsuarioActivo() 
+            ${usuarioActual 
                 ? 'El pago se procesará en pesos chilenos (CLP)' 
                 : 'Debes iniciar sesión para realizar compras'
             }
@@ -682,8 +684,7 @@ function eliminarDelCarrito(id) {
 // ✅ Proceso de compra ultra optimizado
 async function procesarCompraRapido(total) {
     // ✅ Verificar autenticación PRIMERO
-    const usuario = SessionManager?.obtenerUsuarioActivo();
-    if (!usuario) {
+    if (!usuarioActual) {
         mostrarNotificacionRapida('Debes iniciar sesión para realizar una compra', 'warning');
         setTimeout(() => {
             if (confirm('¿Deseas ir a la página de login?')) {
@@ -887,7 +888,6 @@ function cancelarProceso() {
 // Enviar notificación de cancelación desde el carrito
 async function enviarCancelacionCarrito() {
     try {
-        const usuario = SessionManager?.obtenerUsuarioActivo();
         const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
         
         await fetch('/api/webpay/cancel', {

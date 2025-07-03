@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Administración | FerreMas</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <header class="bg-teal-700 text-white p-4">
+    <h1 class="text-2xl font-bold">Panel de Administración</h1>
+  </header>
+
+  <main class="p-8">
+    <h2 class="text-xl font-semibold mb-2">Bienvenido, <span id="admin-name"></span></h2>
+    <p class="mb-4">Accede a la gestión de productos, usuarios y mensajes.</p>
+
+    <div class="space-y-4">
+      <a href="mensajes.html" class="block bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded shadow">
+        Ver Mensajes de Clientes
+      </a>
+      <!-- Puedes agregar más accesos aquí -->
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = JSON.parse(localStorage.getItem("usuarioLogueado"));
+      if (!user || user.rol !== 'ROLE_ADMIN') {
+        window.location.href = 'Administracion.html';
+      } else {
+        document.getElementById('admin-name').textContent = user.nombre;
+      }
+    });
+  </script>
+</body>
+</html>

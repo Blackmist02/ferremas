@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mis Mensajes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <header class="bg-purple-700 text-white p-4">
+    <h1 class="text-xl font-bold">Mis Mensajes</h1>
+  </header>
+
+  <main class="p-6 max-w-4xl mx-auto">
+    <div id="mensajes-usuario" class="space-y-4"></div>
+  </main>
+
+  <script>
+    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (!usuario || usuario.rol !== "ROLE_USER") {
+      window.location.href = "404.html";
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const res = await fetch(`/api/mensajes/usuario/${usuario.id}`);
+      const mensajes = await res.json();
+      const contenedor = document.getElementById("mensajes-usuario");
+
+      if (mensajes.length === 0) {
+        contenedor.innerHTML = "<p class='text-gray-500'>No has enviado mensajes aún.</p>";
+        return;
+      }
+
+      mensajes.forEach((m) => {
+        const div = document.createElement("div");
+        div.className = "bg-white shadow p-4 rounded";
+
+        div.innerHTML = `
+          <p><strong>Mensaje:</strong> ${m.contenido}</p>
+          <p><strong>Respuesta:</strong> ${m.respuesta ? m.respuesta : "<span class='text-gray-500'>Sin respuesta aún</span>"}</p>
+          <p class="text-sm text-gray-500">Fecha: ${new Date(m.fechaEnvio).toLocaleString()}</p>
+        `;
+
+        contenedor.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>

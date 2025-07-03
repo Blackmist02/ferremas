@@ -55,10 +55,20 @@
         const data = await response.json();
 
         if (data.success) {
-          // Guardar usuario en localStorage usando SessionManager
-          SessionManager.guardarSesion(data.usuario);
           alert(`¡Bienvenido ${data.usuario.nombre}!`);
-          window.location.href = "index.html";
+
+          // Guardar usuario activo en localStorage
+          localStorage.setItem('usuarioActivo', JSON.stringify(data.usuario));
+
+          // Redirección según rol
+          if (data.usuario.rol === "ROLE_ADMIN") {
+            window.location.href = "/ver-mensajes";
+          } else if (data.usuario.rol === "ROLE_USER") {
+            window.location.href = "/ver-mis-mensajes";
+          } else {
+            window.location.href = "/404.html";
+          }
+
         } else {
           alert(data.message);
         }

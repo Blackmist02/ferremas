@@ -21,8 +21,6 @@
 
   <!-- HERO -->
   <section class="relative bg-[#005f6a] text-white py-24 px-6 lg:px-20 overflow-hidden rounded-b-3xl shadow-lg flex flex-col lg:flex-row items-center justify-between gap-12">
-    
-    <!-- Texto + CTA -->
     <div class="max-w-xl text-center lg:text-left">
       <h1 class="text-4xl lg:text-6xl font-extrabold mb-6 drop-shadow-lg">
         ¡Todo para tu proyecto en un solo lugar!
@@ -38,27 +36,22 @@
         ¡Equípate con lo mejor y construye con confianza!
       </p>
     </div>
-
-    <!-- Imagen -->
     <div class="max-w-md flex-shrink-0">
       <img src="img/herramienta-destacada.png" alt="Herramienta destacada" class="rounded-2xl shadow-2xl drop-shadow-xl w-full object-contain" />
     </div>
-
-    <!-- Fondo degradado sutil en la base -->
-    <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#005f6a] to-transparent pointer-events-none"></div>
   </section>
 
   <!-- PRODUCTOS DESTACADOS -->
   <section class="py-16 bg-white">
     <div class="max-w-6xl mx-auto px-4">
       <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Productos Destacados</h2>
-      <div id="productos-destacados" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div id="destacados" class="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         <!-- Aquí JS insertará productos -->
       </div>
     </div>
   </section>
 
-  <!-- LLAMADO A LA ACCIÓN -->
+  <!-- CTA -->
   <section class="py-16 bg-gray-100">
     <div class="max-w-4xl mx-auto text-center px-4">
       <h3 class="text-2xl font-semibold text-gray-800 mb-4">¿Eres constructor o maestro ferretero?</h3>
@@ -69,12 +62,65 @@
     </div>
   </section>
 
+  <!-- PANEL ADMIN -->
+  <div class="text-center mt-10 mb-16">
+    <a href="administracion.html" id="admin-panel-link" class="hidden bg-teal-600 text-white px-6 py-3 rounded hover:bg-teal-700 transition shadow-md">
+      Panel Administrativo
+    </a>
+  </div>
+
   <!-- FOOTER -->
   <div id="footer"></div>
 
   <!-- SCRIPTS -->
   <script src="js/include-partials.js"></script>
-  <script src="js/main.js" defer></script>
+  <script src="js/main.js"></script>
   <script src="js/session.js"></script>
+
+  <!-- Lógica robusta -->
+  <script>
+    document.addEventListener("partialsLoaded", () => {
+      const usuario = JSON.parse(localStorage.getItem("usuarioLogueado"));
+
+      if (usuario) {
+        // Redirección para usuarios no admin
+        if (usuario.rol === "ROLE_CLIENTE") {
+          window.location.href = "404.html";
+        }
+
+        // Mostrar botón admin si corresponde
+        if (usuario.rol === "ROLE_ADMIN") {
+          document.getElementById("admin-panel-link")?.classList.remove("hidden");
+        }
+
+        // Mostrar opciones según el rol en el header
+        document.getElementById("user-info")?.classList.remove("hidden");
+        document.getElementById("mobile-user-info")?.classList.remove("hidden");
+        document.getElementById("auth-links")?.classList.add("hidden");
+        document.getElementById("mobile-auth-links")?.classList.add("hidden");
+
+        document.getElementById("welcome-message").innerText = `Hola, ${usuario.nombre}`;
+        document.getElementById("mobile-welcome-message").innerText = `Hola, ${usuario.nombre}`;
+
+        if (usuario.rol === "ROLE_ADMIN") {
+          document.getElementById("admin-links")?.classList.remove("hidden");
+          document.getElementById("mobile-admin-links")?.classList.remove("hidden");
+        } else {
+          document.getElementById("user-links")?.classList.remove("hidden");
+          document.getElementById("mobile-user-links")?.classList.remove("hidden");
+        }
+
+        // Logout
+        document.getElementById("logout-btn")?.addEventListener("click", () => {
+          localStorage.removeItem("usuarioLogueado");
+          window.location.href = "login.html";
+        });
+        document.getElementById("mobile-logout-btn")?.addEventListener("click", () => {
+          localStorage.removeItem("usuarioLogueado");
+          window.location.href = "login.html";
+        });
+      }
+    });
+  </script>
 </body>
 </html>

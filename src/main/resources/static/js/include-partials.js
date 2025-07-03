@@ -1,122 +1,97 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Cargar header
+document.addEventListener('DOMContentLoaded', function () {
     const headerDiv = document.getElementById('header');
+    const footerDiv = document.getElementById('footer');
+
     if (headerDiv) {
         fetch('partials/header.html')
             .then(response => response.text())
             .then(data => {
                 headerDiv.innerHTML = data;
-                
-                // Después de cargar el header, configurar todo
                 setTimeout(() => {
-                    verificarSesionYConfigurar();
+                    configurarHeader();
                 }, 100);
             })
-            .catch(error => {
-                console.error('Error cargando header:', error);
-            });
+            .catch(error => console.error('❌ Error cargando header:', error));
     }
 
-    // Cargar footer
-    const footerDiv = document.getElementById('footer');
     if (footerDiv) {
         fetch('partials/footer.html')
             .then(response => response.text())
             .then(data => {
                 footerDiv.innerHTML = data;
             })
-            .catch(error => {
-                console.error('Error cargando footer:', error);
-            });
+            .catch(error => console.error('❌ Error cargando footer:', error));
     }
 });
 
-function verificarSesionYConfigurar() {
-    console.log('🔧 Configurando header...');
-    
-    // Verificar sesión
-    const usuario = SessionManager ? SessionManager.obtenerUsuarioActivo() : null;
-    
-    if (usuario) {
-        console.log('✅ Mostrando usuario en header:', usuario.nombre);
+async function configurarHeader() {
+    console.log('⚙️ Configurando header...');
+
+    try {
+        const res = await fetch('/api/usuarios/auth/user');
+        if (!res.ok) throw new Error('Usuario no autenticado');
+
+        const usuario = await res.json();
+        console.log(`✅ Usuario activo: ${usuario.nombre} | Rol: ${usuario.rol}`);
+
         mostrarUsuarioEnHeader(usuario);
-    } else {
-        console.log('❌ Mostrando links de auth');
-        mostrarLinksAuth();
+        mostrarLinksPorRol(usuario.rol);
+    } catch (error) {
+        console.log('ℹ️ No hay usuario autenticado');
     }
-    
-    // Configurar eventos
+
     configurarEventos();
-    
-    // Actualizar contador de carrito
     actualizarContadorCarrito();
 }
 
 function mostrarUsuarioEnHeader(usuario) {
-    // Desktop
     const userInfo = document.getElementById('user-info');
-    const authLinks = document.getElementById('auth-links');
     const welcomeMessage = document.getElementById('welcome-message');
-    
-    if (userInfo && authLinks && welcomeMessage) {
+    const authLinks = document.getElementById('auth-links');
+
+    if (userInfo && welcomeMessage && authLinks) {
         welcomeMessage.textContent = `Bienvenido, ${usuario.nombre}`;
         userInfo.classList.remove('hidden');
         userInfo.classList.add('flex');
         authLinks.classList.add('hidden');
     }
-    
-    // Mobile
+
     const mobileUserInfo = document.getElementById('mobile-user-info');
-    const mobileAuthLinks = document.getElementById('mobile-auth-links');
     const mobileWelcomeMessage = document.getElementById('mobile-welcome-message');
-    
-    if (mobileUserInfo && mobileAuthLinks && mobileWelcomeMessage) {
+    const mobileAuthLinks = document.getElementById('mobile-auth-links');
+
+    if (mobileUserInfo && mobileWelcomeMessage && mobileAuthLinks) {
         mobileWelcomeMessage.textContent = `Bienvenido, ${usuario.nombre}`;
         mobileUserInfo.classList.remove('hidden');
         mobileAuthLinks.classList.add('hidden');
     }
 }
 
-function mostrarLinksAuth() {
-    // Desktop
-    const userInfo = document.getElementById('user-info');
-    const authLinks = document.getElementById('auth-links');
-    
-    if (userInfo && authLinks) {
-        userInfo.classList.add('hidden');
-        userInfo.classList.remove('flex');
-        authLinks.classList.remove('hidden');
-    }
-    
-    // Mobile
-    const mobileUserInfo = document.getElementById('mobile-user-info');
-    const mobileAuthLinks = document.getElementById('mobile-auth-links');
-    
-    if (mobileUserInfo && mobileAuthLinks) {
-        mobileUserInfo.classList.add('hidden');
-        mobileAuthLinks.classList.remove('hidden');
+function mostrarLinksPorRol(rol) {
+    if (rol === 'ROLE_ADMIN') {
+        const adminLink = document.getElementById('admin-links');
+        const mobileAdminLink = document.getElementById('mobile-admin-links');
+        if (adminLink) adminLink.classList.remove('hidden');
+        if (mobileAdminLink) mobileAdminLink.classList.remove('hidden');
+    } else {
+        const userLink = document.getElementById('user-links');
+        const mobileUserLink = document.getElementById('mobile-user-links');
+        if (userLink) userLink.classList.remove('hidden');
+        if (mobileUserLink) mobileUserLink.classList.remove('hidden');
     }
 }
 
 function configurarEventos() {
-    // Logout buttons
     const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) logoutBtn.addEventListener('click', cerrarSesion);
+
     const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
-    
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', window.cerrarSesion);
-    }
-    
-    if (mobileLogoutBtn) {
-        mobileLogoutBtn.addEventListener('click', window.cerrarSesion);
-    }
-    
-    // Mobile menu
+    if (mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', cerrarSesion);
+
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
-    
     if (mobileMenuBtn && mobileMenu) {
-        mobileMenuBtn.addEventListener('click', function() {
+        mobileMenuBtn.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
     }
@@ -124,37 +99,29 @@ function configurarEventos() {
 
 function actualizarContadorCarrito() {
     const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-    const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
-    
+    const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+
     const contadorDesktop = document.getElementById('contador-carrito');
-    const contadorMovil = document.getElementById('mobile-cart-count');
-    
-    if (contadorDesktop) {
-        contadorDesktop.textContent = totalItems;
-    }
-    
-    if (contadorMovil) {
-        contadorMovil.textContent = totalItems;
-    }
+    if (contadorDesktop) contadorDesktop.textContent = totalItems;
+
+    const contadorMobile = document.getElementById('mobile-cart-count');
+    if (contadorMobile) contadorMobile.textContent = totalItems;
 }
 
-// Función global para actualizar header después del login
-window.actualizarHeader = function() {
-    console.log('🔄 Actualizando header...');
-    setTimeout(() => {
-        verificarSesionYConfigurar();
-    }, 100);
+window.cerrarSesion = async function () {
+    try {
+        await fetch('/api/usuarios/logout', { method: 'POST' });
+    } catch (error) {
+        console.warn('⚠️ Error al cerrar sesión en el servidor:', error);
+    }
+
+    localStorage.removeItem('carrito');
+    window.location.href = 'index.html';
 };
 
-// Función global para actualizar carrito
-window.actualizarContadorCarrito = actualizarContadorCarrito;
-
-// Función global para cerrar sesión
-window.cerrarSesion = function() {
-    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-        localStorage.removeItem('usuarioActivo');
-        localStorage.removeItem('carrito'); // Opcional: limpiar carrito
-        alert('Sesión cerrada exitosamente');
-        window.location.href = 'index.html';
-    }
+window.actualizarHeader = function () {
+    console.log('🔄 Actualizando header desde login...');
+    setTimeout(() => {
+        configurarHeader();
+    }, 100);
 };

@@ -1,35 +1,38 @@
 <header class="bg-white shadow sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
-      <!-- Logo -->
       <div class="flex-shrink-0">
         <a href="index.html" class="text-2xl font-bold text-purple-600">FerreMas</a>
       </div>
 
-      <!-- Desktop Navigation -->
       <nav class="hidden md:flex space-x-8">
         <a href="index.html" class="text-gray-700 hover:text-purple-600 transition">Inicio</a>
         <a href="productos.html" class="text-gray-700 hover:text-purple-600 transition">Productos</a>
       </nav>
 
-      <!-- Desktop Right Side -->
       <div class="hidden md:flex items-center space-x-4">
-        <!-- Info de usuario (cuando está logueado) -->
         <div id="user-info" class="hidden items-center space-x-2">
           <span id="welcome-message" class="text-gray-700 font-medium bg-green-100 px-3 py-1 rounded"></span>
+
+          <!-- Botones adicionales según el rol -->
+          <div id="admin-links" class="hidden space-x-2">
+            <a href="mensajes.html" class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">Admin Mensajes</a>
+          </div>
+          <div id="user-links" class="hidden space-x-2">
+            <a href="misMensajes.html" class="text-sm text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded">Mis Mensajes</a>
+          </div>
+
           <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition">
             Cerrar Sesión
           </button>
         </div>
 
-        <!-- Enlaces de login/registro (cuando no está logueado) -->
         <div id="auth-links" class="flex items-center space-x-2">
           <a href="login.html" class="text-gray-700 hover:text-purple-600 text-sm transition">Iniciar Sesión</a>
           <span class="text-gray-400">|</span>
           <a href="registro.html" class="text-gray-700 hover:text-purple-600 text-sm transition">Registro</a>
         </div>
 
-        <!-- Carrito -->
         <a href="carrito.html" class="relative flex items-center text-gray-700 hover:text-purple-600 transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.6 7.2M7 13L5.4 5M7 13l2.2 8.8"></path>
@@ -38,7 +41,6 @@
         </a>
       </div>
 
-      <!-- Mobile menu button -->
       <div class="md:hidden">
         <button id="mobile-menu-btn" class="text-gray-700 hover:text-purple-600">
           <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -57,18 +59,55 @@
         <span id="mobile-cart-count" class="ml-2 bg-purple-600 text-white text-xs rounded-full px-2 py-1">0</span>
       </a>
 
-      <!-- Información de usuario móvil -->
       <div id="mobile-user-info" class="hidden border-t pt-2">
         <span id="mobile-welcome-message" class="block text-gray-700 py-1 font-medium bg-green-100 px-3 py-1 rounded"></span>
-        <button id="mobile-logout-btn" class="block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm mt-2">
-          Cerrar Sesión
-        </button>
+        <button id="mobile-logout-btn" class="block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm mt-2">Cerrar Sesión</button>
+
+        <div id="mobile-admin-links" class="hidden mt-2 space-y-1">
+          <a href="mensajes.html" class="block bg-blue-600 hover:bg-blue-700 text-white text-sm rounded px-3 py-1">Admin Mensajes</a>
+        </div>
+        <div id="mobile-user-links" class="hidden mt-2 space-y-1">
+          <a href="misMensajes.html" class="block bg-green-600 hover:bg-green-700 text-white text-sm rounded px-3 py-1">Mis Mensajes</a>
+        </div>
       </div>
 
-      <!-- Enlaces móviles de login/registro -->
       <div id="mobile-auth-links" class="border-t pt-2 space-y-1">
         <a href="login.html" class="block text-gray-700 hover:text-purple-600 py-1">Iniciar Sesión</a>
         <a href="registro.html" class="block text-gray-700 hover:text-purple-600 py-1">Registro</a>
       </div>
     </nav>
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const usuario = JSON.parse(localStorage.getItem("usuarioLogueado"));
+      if (usuario) {
+        document.getElementById("user-info").classList.remove("hidden");
+        document.getElementById("mobile-user-info").classList.remove("hidden");
+        document.getElementById("auth-links").classList.add("hidden");
+        document.getElementById("mobile-auth-links").classList.add("hidden");
+
+        document.getElementById("welcome-message").innerText = `Hola, ${usuario.nombre}`;
+        document.getElementById("mobile-welcome-message").innerText = `Hola, ${usuario.nombre}`;
+
+        if (usuario.rol === "ROLE_ADMIN") {
+          document.getElementById("admin-links").classList.remove("hidden");
+          document.getElementById("mobile-admin-links").classList.remove("hidden");
+        } else {
+          document.getElementById("user-links").classList.remove("hidden");
+          document.getElementById("mobile-user-links").classList.remove("hidden");
+        }
+
+        document.getElementById("logout-btn").addEventListener("click", () => {
+          localStorage.removeItem("usuarioLogueado");
+          window.location.href = "login.html";
+        });
+
+        document.getElementById("mobile-logout-btn").addEventListener("click", () => {
+          localStorage.removeItem("usuarioLogueado");
+          window.location.href = "login.html";
+        });
+      }
+    });
+  </script>
+</header>
