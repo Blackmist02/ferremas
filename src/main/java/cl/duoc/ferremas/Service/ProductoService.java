@@ -15,4 +15,5 @@ public interface ProductoService {
     Productos findByCodigo(String codigo);
     Productos findByCodigoProducto(String codigoProducto);  // <-- nuevo método
     Page<Productos> findAll(PageRequest pageRequest);
+    long countAll(); // <-- nuevo método para contar productos
 }
