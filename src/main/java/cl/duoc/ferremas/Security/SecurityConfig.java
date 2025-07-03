@@ -4,61 +4,63 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Autowired
+    private UsuarioDetailsServiceImpl usuarioDetailsService;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(authz -> authz
-                // Permitir acceso público a páginas web
-                .requestMatchers("/", "/index.html", "/productos.html", "/carrito.html", "/productoInd.html").permitAll()
-                .requestMatchers("/login.html", "/registro.html").permitAll()
-                .requestMatchers("/webpay-success.html", "/webpay-failure.html").permitAll()
+                // Rutas que requieren autenticación (solo admin)
+                .requestMatchers("/Administracion.html").authenticated()
+                .requestMatchers("/api/usuarios/usuario", "/api/usuarios/usuarios").authenticated()
+                .requestMatchers("/api/suc/**").authenticated()
+                .requestMatchers("/api/boleta/**").authenticated()
                 
-                // Permitir acceso a recursos estáticos
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/partials/**").permitAll()
-                .requestMatchers("/favicon.ico").permitAll()
-                
-                // APIs públicas (sin autenticación)
-                .requestMatchers("/api/usuarios/registro", "/api/usuarios/login").permitAll()
-                .requestMatchers("/api/productos/**").permitAll()
-                .requestMatchers("/api/divisas/**").permitAll()
-                .requestMatchers("/api/webpay/**").permitAll()
-                
-                // APIs administrativas (requieren autenticación básica)
-                .requestMatchers("/api/usuarios/usuario", "/api/usuarios/usuarios").hasRole("ADMIN")
-                .requestMatchers("/api/suc/**").hasRole("ADMIN")
-                .requestMatchers("/api/boleta/**").hasRole("ADMIN")
-                
-                // Cualquier otra petición requiere autenticación
-                .anyRequest().authenticated()
+                // Todo lo demás es público - NO REQUIERE AUTENTICACIÓN
+                .anyRequest().permitAll()
             )
-            .authenticationProvider(authenticationProvider())
-            .httpBasic(httpBasic -> httpBasic.realmName("Ferremas Admin API"));
+            .userDetailsService(usuarioDetailsService)
+            .httpBasic(httpBasic -> httpBasic
+                .authenticationEntryPoint((request, response, authException) -> {
+                    String requestUri = request.getRequestURI();
+                    // Solo mostrar diálogo de autenticación para rutas administrativas específicas
+                    if (requestUri.equals("/Administracion.html") || 
+                        requestUri.startsWith("/api/usuarios/usuario") || 
+                        requestUri.startsWith("/api/usuarios/usuarios") ||
+                        requestUri.startsWith("/api/suc/") ||
+                        requestUri.startsWith("/api/boleta/")) {
+                        response.setHeader("WWW-Authenticate", "Basic realm=\"Ferremas Admin\"");
+                        response.setStatus(401);
+                    } else {
+                        // Para todas las otras rutas, NO mostrar diálogo de autenticación
+                        response.setStatus(403);
+                        response.getWriter().write("{\"error\":\"Access denied\"}");
+                        response.setContentType("application/json");
+                    }
+                })
+            );
 
         return http.build();
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-    @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Contraseñas seguras
+        return new BCryptPasswordEncoder();
     }
 
     @Bean

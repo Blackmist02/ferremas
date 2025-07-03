@@ -78,7 +78,9 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(rol));
+        // Asegurar que el rol tenga el prefijo ROLE_
+        String rolConPrefijo = rol.startsWith("ROLE_") ? rol : "ROLE_" + rol;
+        return List.of(new SimpleGrantedAuthority(rolConPrefijo));
     }
 
     @Override

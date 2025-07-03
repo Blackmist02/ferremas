@@ -3,13 +3,17 @@
 // Obtener usuario desde la sesión del backend
 window.obtenerUsuarioActivo = async function() {
   try {
-    const res = await fetch('/api/usuarios/auth/user');
+    const res = await fetch('/api/usuarios/session/user'); // ✅ Cambio de endpoint
     if (!res.ok) throw new Error('No autenticado');
-    const usuario = await res.json();
-    console.log('✅ Usuario activo:', usuario.nombre, '| Rol:', usuario.rol);
-    return usuario;
+    const data = await res.json();
+    if (data.success && data.usuario) {
+      console.log('✅ Usuario activo:', data.usuario.nombre, '| Rol:', data.usuario.rol);
+      return data.usuario;
+    } else {
+      throw new Error('Respuesta inválida');
+    }
   } catch (error) {
-    console.warn('❌ Usuario no autenticado o sesión expirada');
+    console.log('ℹ️ Usuario no autenticado (normal para páginas públicas)');
     return null;
   }
 };
@@ -32,14 +36,15 @@ window.cerrarSesion = async function() {
   }
 };
 
-// Verificación automática al cargar el script (opcional)
+// Verificación automática al cargar el script (SIN redirigir en páginas públicas)
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('🔍 Verificando sesión desde backend...');
   const usuario = await obtenerUsuarioActivo();
 
   if (!usuario) {
-    console.log('🔒 Usuario no logueado. Redirigiendo a login...');
-    // Puedes redirigir si estás en una vista privada
-    // window.location.href = 'login.html';
+    console.log('ℹ️ Usuario no logueado (normal para páginas públicas)');
+    // ✅ NO redirigir automáticamente - permitir navegación libre
+  } else {
+    console.log('✅ Usuario logueado:', usuario.nombre);
   }
 });

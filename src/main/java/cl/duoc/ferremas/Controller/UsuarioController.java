@@ -177,4 +177,26 @@ public ResponseEntity<?> logout(HttpSession session) {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+
+    // Obtener usuario actual de la sesión (para JavaScript)
+    @GetMapping("/session/user")
+    public ResponseEntity<Map<String, Object>> getUsuarioSesion(HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                Map.of("success", false, "message", "No hay usuario en sesión")
+            );
+        }
+        
+        Map<String, Object> response = Map.of(
+            "success", true,
+            "usuario", Map.of(
+                "id", usuario.getId(),
+                "nombre", usuario.getNombre(),
+                "correo", usuario.getCorreo(),
+                "rol", usuario.getRol()
+            )
+        );
+        return ResponseEntity.ok(response);
+    }
 }
