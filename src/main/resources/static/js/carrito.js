@@ -563,21 +563,38 @@ function renderizarCarritoCompleto(carrito, productos, contenedor, idsFaltantes 
             }
         })()}
         
-        <button onclick="procesarCompraRapido(${total})" 
-                class="w-full py-4 rounded-lg font-bold text-lg transition transform hover:scale-105 ${
-                    idsFaltantes.length > 0 || !SessionManager?.obtenerUsuarioActivo() 
-                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed opacity-50' 
-                        : 'bg-green-500 hover:bg-green-600 text-white'
-                }"
-                ${idsFaltantes.length > 0 || !SessionManager?.obtenerUsuarioActivo() ? 'disabled' : ''}>
-                🛒 ${
-                    idsFaltantes.length > 0 
-                        ? 'Productos no disponibles' 
-                        : !SessionManager?.obtenerUsuarioActivo()
-                            ? 'Inicia sesión para comprar'
-                            : 'Pagar con Webpay'
-                }
-        </button>
+        <!-- Botones de acción -->
+        <div class="space-y-3">
+            <button onclick="procesarCompraRapido(${total})" 
+                    class="w-full py-4 rounded-lg font-bold text-lg transition transform hover:scale-105 ${
+                        idsFaltantes.length > 0 || !SessionManager?.obtenerUsuarioActivo() 
+                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed opacity-50' 
+                            : 'bg-green-500 hover:bg-green-600 text-white'
+                    }"
+                    ${idsFaltantes.length > 0 || !SessionManager?.obtenerUsuarioActivo() ? 'disabled' : ''}>
+                    🛒 ${
+                        idsFaltantes.length > 0 
+                            ? 'Productos no disponibles' 
+                            : !SessionManager?.obtenerUsuarioActivo()
+                                ? 'Inicia sesión para comprar'
+                                : 'Pagar con Webpay'
+                    }
+            </button>
+            
+            <!-- Botones secundarios -->
+            <div class="flex space-x-3">
+                <button onclick="continuarComprando()" 
+                        class="flex-1 py-3 rounded-lg font-semibold text-sm transition bg-orange-500 hover:bg-orange-600 text-white">
+                    🛍️ Continuar Comprando
+                </button>
+                
+                <button onclick="cancelarProceso()" 
+                        class="flex-1 py-3 rounded-lg font-semibold text-sm transition bg-gray-500 hover:bg-gray-600 text-white">
+                    ❌ Cancelar
+                </button>
+            </div>
+        </div>
+        
         <p class="text-xs text-gray-500 text-center mt-2">
             ${SessionManager?.obtenerUsuarioActivo() 
                 ? 'El pago se procesará en pesos chilenos (CLP)' 
@@ -844,3 +861,120 @@ function cambiarCantidad(id, nuevaCantidad) {
 // ✅ Exportar nuevas funciones
 window.cambiarCantidad = cambiarCantidad;
 window.renderizarCarritoCompleto = renderizarCarritoCompleto;
+
+// ✅ Funciones de navegación y cancelación
+function continuarComprando() {
+    console.log('🛍️ Usuario eligió continuar comprando');
+    mostrarNotificacionRapida('Redirigiendo a productos...', 'info');
+    setTimeout(() => {
+        window.location.href = '/productos.html';
+    }, 500);
+}
+
+function cancelarProceso() {
+    console.log('❌ Usuario eligió cancelar el proceso');
+    
+    // Enviar notificación de cancelación al servidor
+    enviarCancelacionCarrito();
+    
+    // Redirigir a página de cancelación
+    mostrarNotificacionRapida('Proceso cancelado', 'warning');
+    setTimeout(() => {
+        window.location.href = '/webpay-cancel.html?source=carrito';
+    }, 1000);
+}
+
+// Enviar notificación de cancelación desde el carrito
+async function enviarCancelacionCarrito() {
+    try {
+        const usuario = SessionManager?.obtenerUsuarioActivo();
+        const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        
+        await fetch('/api/webpay/cancel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                reason: 'cancelled_from_cart',
+                usuario: usuario ? usuario.correo : 'anonimo',
+                productos: carrito.length,
+                timestamp: new Date().toISOString()
+            })
+        });
+        
+        console.log('✅ Cancelación registrada desde carrito');
+    } catch (error) {
+        console.error('❌ Error al registrar cancelación:', error);
+    }
+}
+
+// ✅ Función para limpiar carrito (opcional)
+function limpiarCarrito() {
+    const confirmar = confirm('¿Estás seguro de que deseas vaciar todo el carrito?');
+    
+    if (confirmar) {
+        localStorage.removeItem('carrito');
+        mostrarCarritoOptimizado();
+        
+        // Actualizar contador si existe
+        if (window.actualizarContadorCarrito) {
+            window.actualizarContadorCarrito();
+        }
+        
+        mostrarNotificacionRapida('Carrito vaciado', 'info');
+        console.log('🧹 Carrito limpiado por el usuario');
+    }
+}
+
+// ✅ Función para confirmar antes de abandonar la página (si hay productos)
+window.addEventListener('beforeunload', function(e) {
+    const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+    
+    // Solo mostrar advertencia si hay productos y estamos saliendo hacia otro dominio
+    if (carrito.length > 0 && !e.target.location.href.includes(window.location.hostname)) {
+        const mensaje = 'Tienes productos en tu carrito. ¿Seguro que quieres salir?';
+        e.returnValue = mensaje;
+        return mensaje;
+    }
+});
+
+// ✅ Mejorar proceso de compra con opción de cancelar
+async function procesarCompraConCancelacion(total) {
+    // Mostrar modal de confirmación con opción de cancelar
+    const modalHtml = `
+        <div id="modal-confirmacion" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+                <h3 class="text-xl font-bold mb-4">Confirmar Pago</h3>
+                <p class="text-gray-600 mb-4">
+                    Estás a punto de ser redirigido a Webpay para procesar un pago de 
+                    <strong>$${total.toLocaleString('es-CL')}</strong>
+                </p>
+                <div class="flex space-x-3">
+                    <button onclick="confirmarPago(${total})" 
+                            class="flex-1 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
+                        Continuar
+                    </button>
+                    <button onclick="cerrarModalConfirmacion()" 
+                            class="flex-1 bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function confirmarPago(total) {
+    cerrarModalConfirmacion();
+    procesarCompraRapido(total);
+}
+
+function cerrarModalConfirmacion() {
+    const modal = document.getElementById('modal-confirmacion');
+    if (modal) {
+        modal.remove();
+    }
+}

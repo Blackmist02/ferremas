@@ -40,7 +40,7 @@ public class SecurityConfig {
                 // Permitir acceso público a páginas web estáticas
                 .requestMatchers("/", "/index.html", "/productos.html", "/carrito.html", "/productoInd.html").permitAll()
                 .requestMatchers("/login.html", "/registro.html").permitAll()
-                .requestMatchers("/webpay-success.html", "/webpay-failure.html").permitAll()
+                .requestMatchers("/webpay-success.html", "/webpay-failure.html", "/webpay-cancel.html").permitAll()
                 
                 // Permitir acceso a recursos estáticos (CSS, JS, imágenes, etc.)
                 .requestMatchers("/css/**", "/js/**", "/img/**", "/images/**", "/partials/**").permitAll()
