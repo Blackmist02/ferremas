@@ -62,104 +62,114 @@ public class BancoCentralService {
     }
 
     private void procesarSerieTipoCambio(String seriesId, String nombre, String fechaInicio, String fechaHoy, List<DivisaDTO> resultado, RestTemplate restTemplate) {
-    try {
-        String getUrl = String.format(
-                "%s?user=%s&pass=%s&function=GetSeries&timeseries=%s&firstdate=%s&lastdate=%s",
-                BASE_URL, user, password, seriesId, fechaInicio, fechaHoy);
+        try {
+            String getUrl = String.format(
+                    "%s?user=%s&pass=%s&function=GetSeries&timeseries=%s&firstdate=%s&lastdate=%s",
+                    BASE_URL, user, password, seriesId, fechaInicio, fechaHoy);
 
-        System.out.println("Consultando serie: " + seriesId + " - " + nombre);
-        System.out.println("URL: " + getUrl);
-        
-        String getResponse = restTemplate.getForObject(getUrl, String.class);
-        
-        if (getResponse == null || getResponse.trim().isEmpty()) {
-            System.out.println("Respuesta vacía para serie: " + seriesId);
-            return;
-        }
-        
-        System.out.println("Respuesta recibida (primeros 500 caracteres): " + 
-                          getResponse.substring(0, Math.min(500, getResponse.length())));
-        
-        JSONObject responseJson = new JSONObject(getResponse);
-        
-        // Verificar si hay errores en la respuesta
-        if (responseJson.has("error")) {
-            System.out.println("Error en serie " + seriesId + ": " + responseJson.getString("error"));
-            return;
-        }
-        
-        Object seriesDataObj = responseJson.opt("Series");
-        if (seriesDataObj == null) {
-            System.out.println("No hay datos 'Series' para: " + seriesId);
-            System.out.println("Claves disponibles en la respuesta: " + responseJson.keys());
-            return;
-        }
-        
-        JSONArray seriesData;
-        if (seriesDataObj instanceof JSONArray) {
-            seriesData = (JSONArray) seriesDataObj;
-            System.out.println("Series es un array con " + seriesData.length() + " elementos");
-        } else if (seriesDataObj instanceof JSONObject) {
-            seriesData = new JSONArray();
-            seriesData.put(seriesDataObj);
-            System.out.println("Series es un objeto, convertido a array");
-        } else {
-            System.out.println("Formato de datos desconocido para: " + seriesId + ", tipo: " + seriesDataObj.getClass());
-            return;
-        }
-
-        if (seriesData.length() > 0) {
-            JSONObject serieData = seriesData.getJSONObject(0);
-            System.out.println("Claves en serieData: " + serieData.keys());
+            System.out.println("Consultando serie: " + seriesId + " - " + nombre);
             
-            JSONArray obs = serieData.optJSONArray("obs");
-            if (obs == null) {
-                // Probar con diferentes nombres de campo
-                obs = serieData.optJSONArray("Obs");
-                if (obs == null) {
-                    obs = serieData.optJSONArray("observations");
-                    if (obs == null) {
-                        System.out.println("No se encontró campo de observaciones. Campos disponibles: " + serieData.keys());
-                        return;
-                    }
-                }
+            String getResponse = restTemplate.getForObject(getUrl, String.class);
+            
+            if (getResponse == null || getResponse.trim().isEmpty()) {
+                System.out.println("Respuesta vacía para serie: " + seriesId);
+                return;
             }
             
-            System.out.println("Número de observaciones encontradas: " + obs.length());
+            JSONObject responseJson = new JSONObject(getResponse);
             
-            if (obs.length() > 0) {
-                // Mostrar las últimas 3 observaciones para debug
-                for (int i = Math.max(0, obs.length() - 3); i < obs.length(); i++) {
-                    JSONObject observacion = obs.getJSONObject(i);
-                    System.out.println("Obs " + i + ": " + observacion.toString());
+            // Verificar si hay errores en la respuesta
+            if (responseJson.has("error")) {
+                System.out.println("Error en serie " + seriesId + ": " + responseJson.getString("error"));
+                return;
+            }
+            
+            Object seriesDataObj = responseJson.opt("Series");
+            if (seriesDataObj == null) {
+                System.out.println("No hay datos 'Series' para: " + seriesId);
+                // Corregir la impresión del iterator
+                StringBuilder keys = new StringBuilder();
+                responseJson.keys().forEachRemaining(key -> keys.append(key).append(", "));
+                System.out.println("Claves disponibles en la respuesta: " + keys.toString());
+                return;
+            }
+            
+            JSONArray seriesData;
+            if (seriesDataObj instanceof JSONArray) {
+                seriesData = (JSONArray) seriesDataObj;
+                System.out.println("Series es un array con " + seriesData.length() + " elementos");
+            } else if (seriesDataObj instanceof JSONObject) {
+                seriesData = new JSONArray();
+                seriesData.put(seriesDataObj);
+                System.out.println("Series es un objeto, convertido a array");
+            } else {
+                System.out.println("Formato de datos desconocido para: " + seriesId + ", tipo: " + seriesDataObj.getClass());
+                return;
+            }
+
+            if (seriesData.length() > 0) {
+                JSONObject serieData = seriesData.getJSONObject(0);
+                
+                // Corregir la impresión de claves
+                StringBuilder serieKeys = new StringBuilder();
+                serieData.keys().forEachRemaining(key -> serieKeys.append(key).append(", "));
+                System.out.println("Claves en serieData: " + serieKeys.toString());
+                
+                JSONArray obs = serieData.optJSONArray("obs");
+                if (obs == null) {
+                    obs = serieData.optJSONArray("Obs");
+                    if (obs == null) {
+                        obs = serieData.optJSONArray("observations");
+                        if (obs == null) {
+                            System.out.println("No se encontró campo de observaciones. Campos disponibles: " + serieKeys.toString());
+                            return;
+                        }
+                    }
                 }
                 
-                // Tomar la última observación
-                JSONObject ultimaObs = obs.getJSONObject(obs.length() - 1);
-                String fechaValor = ultimaObs.optString("indexDateString", "");
+                System.out.println("Número de observaciones encontradas: " + obs.length());
                 
-                if (!ultimaObs.isNull("value")) {
-                    double valor = ultimaObs.getDouble("value");
+                if (obs.length() > 0) {
+                    // Filtrar observaciones válidas (no NaN y statusCode OK)
+                    JSONObject ultimaObsValida = null;
+                    String fechaValor = "";
                     
-                    if (valor > 0) {
-                        resultado.add(new DivisaDTO(seriesId, nombre, fechaValor, valor));
-                        System.out.println("✓ " + nombre + ": $" + String.format("%.2f", valor) + " (" + fechaValor + ")");
+                    // Buscar la última observación válida
+                    for (int i = obs.length() - 1; i >= 0; i--) {
+                        JSONObject observacion = obs.getJSONObject(i);
+                        String statusCode = observacion.optString("statusCode", "");
+                        String valueStr = observacion.optString("value", "");
+                        
+                        // Solo procesar si no es NaN y el status es OK
+                        if (!"NaN".equals(valueStr) && "OK".equals(statusCode) && !observacion.isNull("value")) {
+                            ultimaObsValida = observacion;
+                            fechaValor = observacion.optString("indexDateString", "");
+                            break;
+                        }
+                    }
+                    
+                    if (ultimaObsValida != null) {
+                        double valor = ultimaObsValida.getDouble("value");
+                        
+                        if (valor > 0) {
+                            resultado.add(new DivisaDTO(seriesId, nombre, fechaValor, valor));
+                            System.out.println("✓ " + nombre + ": $" + String.format("%.2f", valor) + " (" + fechaValor + ")");
+                        } else {
+                            System.out.println("Valor inválido (<=0): " + valor);
+                        }
                     } else {
-                        System.out.println("Valor inválido (<=0): " + valor);
+                        System.out.println("No se encontraron observaciones válidas para: " + seriesId);
                     }
                 } else {
-                    System.out.println("Valor es null en la observación");
+                    System.out.println("No hay observaciones para: " + seriesId);
                 }
             } else {
-                System.out.println("No hay observaciones para: " + seriesId);
+                System.out.println("No hay datos de series para: " + seriesId);
             }
-        } else {
-            System.out.println("No hay datos de series para: " + seriesId);
+            
+        } catch (Exception e) {
+            System.err.println("Error al procesar serie " + seriesId + ": " + e.getMessage());
+            e.printStackTrace();
         }
-        
-    } catch (Exception e) {
-        System.err.println("Error al procesar serie " + seriesId + ": " + e.getMessage());
-        e.printStackTrace();
     }
-}
 }

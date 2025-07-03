@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import cl.duoc.ferremas.Model.Productos;
 import cl.duoc.ferremas.Service.ProductoService;
@@ -24,59 +27,110 @@ import cl.duoc.ferremas.Service.ProductoService;
 @RequestMapping("/api/productos")
 @CrossOrigin(origins = "*")
 public class ProductoController {
-
+    
     @Autowired
     private ProductoService productoService;
 
-    @GetMapping
-    public ResponseEntity<List<Productos>> listar() {
-        List<Productos> productos = productoService.findAll();
-        if (productos.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    // ✅ Endpoint con paginación REAL Y fallback
+    @GetMapping("/producto")
+    public ResponseEntity<?> listar(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size) {
+        
+        try {
+            System.out.println("🔍 Solicitando página: " + page + ", tamaño: " + size);
+            
+            // ✅ Intentar paginación primero
+            try {
+                PageRequest pageRequest = PageRequest.of(page, size);
+                Page<Productos> productosPage = productoService.findAll(pageRequest);
+                
+                // ✅ Retornar formato Spring Boot estándar
+                Map<String, Object> response = new HashMap<>();
+                response.put("content", productosPage.getContent());
+                response.put("totalElements", productosPage.getTotalElements());
+                response.put("totalPages", productosPage.getTotalPages());
+                response.put("currentPage", productosPage.getNumber());
+                response.put("size", productosPage.getSize());
+                
+                System.out.println("✅ Paginación exitosa: " + productosPage.getContent().size() + " productos");
+                return ResponseEntity.ok(response);
+                
+            } catch (Exception paginacionError) {
+                System.out.println("⚠️ Error en paginación, usando fallback: " + paginacionError.getMessage());
+                
+                // ✅ Fallback: simular paginación en memoria
+                List<Productos> todosLosProductos = productoService.findAll();
+                
+                int start = page * size;
+                int end = Math.min(start + size, todosLosProductos.size());
+                
+                if (start >= todosLosProductos.size()) {
+                    // Página fuera de rango
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("content", new ArrayList<>());
+                    response.put("totalElements", todosLosProductos.size());
+                    response.put("totalPages", (int) Math.ceil((double) todosLosProductos.size() / size));
+                    response.put("currentPage", page);
+                    response.put("size", size);
+                    return ResponseEntity.ok(response);
+                }
+                
+                List<Productos> productosPagina = todosLosProductos.subList(start, end);
+                
+                Map<String, Object> response = new HashMap<>();
+                response.put("content", productosPagina);
+                response.put("totalElements", todosLosProductos.size());
+                response.put("totalPages", (int) Math.ceil((double) todosLosProductos.size() / size));
+                response.put("currentPage", page);
+                response.put("size", size);
+                
+                System.out.println("✅ Fallback exitoso: " + productosPagina.size() + " productos");
+                return ResponseEntity.ok(response);
+            }
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error general en endpoint: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Error al cargar productos");
+            error.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(error);
         }
-        return ResponseEntity.ok(productos);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Productos> obtenerPorId(@PathVariable Long id) {
         Productos producto = productoService.findById(id);
-        if (producto == null) {
+        if (producto != null) {
+            return ResponseEntity.ok(producto);
+        } else {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(producto);
     }
 
     @GetMapping("/codigo/{codigo}")
     public ResponseEntity<Productos> obtenerPorCodigo(@PathVariable String codigo) {
         Productos producto = productoService.findByCodigo(codigo);
-        if (producto == null) {
+        if (producto != null) {
+            return ResponseEntity.ok(producto);
+        } else {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(producto);
     }
 
     @GetMapping("/codigo-producto/{codigoProducto}")
     public ResponseEntity<Productos> obtenerPorCodigoProducto(@PathVariable String codigoProducto) {
-        Productos productoPorCodigoProducto = productoService.findByCodigoProducto(codigoProducto);
-        if (productoPorCodigoProducto == null) {
+        Productos producto = productoService.findByCodigoProducto(codigoProducto);
+        if (producto != null) {
+            return ResponseEntity.ok(producto);
+        } else {
             return ResponseEntity.notFound().build();
         }
-
-        Productos productoPorCodigo = productoService.findByCodigo(productoPorCodigoProducto.getCodigo());
-        if (productoPorCodigo == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(productoPorCodigo);
     }
 
-    @PostMapping
-    public ResponseEntity<Productos> guardar(@RequestBody Productos producto) {
-        Productos nuevoProducto = productoService.save(producto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
-    }
-
-    @PostMapping("/lista")
+    @PostMapping("/productos")
     public ResponseEntity<List<Productos>> guardarLista(@RequestBody List<Productos> productos) {
         List<Productos> nuevosProductos = productoService.saveAll(productos);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevosProductos);
@@ -95,27 +149,13 @@ public class ProductoController {
 
     @PutMapping("/producto/{id}/stock")
     public ResponseEntity<Productos> actualizarStock(@PathVariable Long id, @RequestBody Map<String, Integer> stockData) {
-        try {
-            Productos producto = productoService.findById(id);
-            if (producto == null) {
-                return ResponseEntity.notFound().build();
-            }
-
-            Integer nuevaCantidad = stockData.get("cantidad");
-            if (nuevaCantidad == null || nuevaCantidad < 0) {
-                return ResponseEntity.badRequest().build();
-            }
-
-            if (producto.getStock() < nuevaCantidad) {
-                return ResponseEntity.badRequest().build();
-            }
-
-            producto.setStock(producto.getStock() - nuevaCantidad);
-            Productos productoActualizado = productoService.save(producto);
-            return ResponseEntity.ok(productoActualizado);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+        Productos producto = productoService.findById(id);
+        if (producto == null) {
+            return ResponseEntity.notFound().build();
         }
+        producto.setStock(stockData.get("stock"));
+        Productos productoActualizado = productoService.save(producto);
+        return ResponseEntity.ok(productoActualizado);
     }
 
     @PostMapping("/reducir-stock")
@@ -157,6 +197,33 @@ public class ProductoController {
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("error", "Error interno del servidor");
+            return ResponseEntity.internalServerError().body(error);
+        }
+    }
+
+    @PostMapping("/restaurar-stock")
+    public ResponseEntity<Map<String, Object>> restaurarStock(@RequestBody List<Map<String, Object>> itemsCarrito) {
+        try {
+            for (Map<String, Object> item : itemsCarrito) {
+                Long productoId = Long.valueOf(item.get("id").toString());
+                Integer cantidad = Math.abs(Integer.valueOf(item.get("cantidad").toString()));
+                
+                Productos producto = productoService.findById(productoId);
+                if (producto != null) {
+                    producto.setStock(producto.getStock() + cantidad);
+                    productoService.save(producto);
+                }
+            }
+            
+            Map<String, Object> resultado = new HashMap<>();
+            resultado.put("success", true);
+            resultado.put("mensaje", "Stock restaurado correctamente");
+            return ResponseEntity.ok(resultado);
+            
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", "Error al restaurar stock");
             return ResponseEntity.internalServerError().body(error);
         }
     }

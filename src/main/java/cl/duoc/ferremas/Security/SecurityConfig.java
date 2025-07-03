@@ -8,35 +8,38 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
+                // Permitir acceso público a páginas web
                 .requestMatchers("/", "/index.html", "/productos.html", "/carrito.html", "/productoInd.html").permitAll()
                 .requestMatchers("/login.html", "/registro.html").permitAll()
                 .requestMatchers("/webpay-success.html", "/webpay-failure.html").permitAll()
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/partials/**", "/favicon.ico").permitAll()
-
-                // APIs públicas
+                
+                // Permitir acceso a recursos estáticos
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/partials/**").permitAll()
+                .requestMatchers("/favicon.ico").permitAll()
+                
+                // APIs públicas (sin autenticación)
                 .requestMatchers("/api/usuarios/registro", "/api/usuarios/login").permitAll()
-                .requestMatchers("/api/productos/**", "/api/divisas/**", "/api/webpay/**").permitAll()
-
-                // APIs restringidas
-                .requestMatchers("/api/usuarios/usuario", "/api/usuarios/usuarios", "/api/usuarios/crear").hasRole("ADMIN")
-                .requestMatchers("/api/suc/**", "/api/boleta/**").hasRole("ADMIN")
-
+                .requestMatchers("/api/productos/**").permitAll()
+                .requestMatchers("/api/divisas/**").permitAll()
+                .requestMatchers("/api/webpay/**").permitAll()
+                
+                // APIs administrativas (requieren autenticación básica)
+                .requestMatchers("/api/usuarios/usuario", "/api/usuarios/usuarios").hasRole("ADMIN")
+                .requestMatchers("/api/suc/**").hasRole("ADMIN")
+                .requestMatchers("/api/boleta/**").hasRole("ADMIN")
+                
+                // Cualquier otra petición requiere autenticación
                 .anyRequest().authenticated()
             )
             .authenticationProvider(authenticationProvider())
