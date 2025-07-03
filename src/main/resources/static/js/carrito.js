@@ -4,13 +4,21 @@ let tasasDivisas = { CLP: 1 }; // CLP es la base
 document.addEventListener('DOMContentLoaded', async () => {
     const yearSpan = document.getElementById('currentYear');
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
-    
-    // Verificar si hay usuario logueado usando SessionManager
-    const usuario = SessionManager ? SessionManager.obtenerUsuarioActivo() : null;
-    if (usuario) {
-        console.log('Usuario logueado:', usuario.nombre);
+
+    // Obtener usuario activo desde backend
+    let usuario = null;
+    try {
+        const res = await fetch('/api/usuarios/auth/user');
+        if (res.ok) {
+            usuario = await res.json();
+            console.log('Usuario logueado:', usuario.nombre);
+        } else {
+            console.log('No hay usuario autenticado');
+        }
+    } catch (error) {
+        console.error('Error al obtener usuario activo:', error);
     }
-    
+
     await cargarTasasDivisas();
     mostrarCarrito();
 });
@@ -23,11 +31,10 @@ async function cargarTasasDivisas() {
         console.log('Tasas de divisas cargadas:', tasasDivisas);
     } catch (e) {
         console.error('Error cargando divisas:', e);
-        // Tasas de fallback aproximadas
         tasasDivisas = {
             CLP: 1,
-            USD: 0.0011,  // Aproximadamente 1 USD = 900 CLP
-            EUR: 0.00095  // Aproximadamente 1 EUR = 1050 CLP
+            USD: 0.0011,
+            EUR: 0.00095
         };
     }
 }
@@ -39,11 +46,16 @@ function mostrarCarrito() {
         cont.innerHTML = '<p class="text-gray-600">El carrito está vacío.</p>';
         return;
     }
-    
-    // Obtener todos los productos para mostrar detalles
-    fetch('/api/productos/producto')
+
+    fetch('/api/productos')
         .then(res => res.json())
         .then(productos => {
+            if (!Array.isArray(productos)) {
+                throw new Error('Respuesta inesperada del servidor. Se esperaba una lista de productos.');
+            }
+
+            console.log('Productos recibidos:', productos);
+
             let total = 0;
             cont.innerHTML = `
                 <div class="mb-4 flex justify-end items-center">
@@ -76,8 +88,8 @@ function mostrarCarrito() {
                             const precioConvertido = convertirMoneda(precioCLP);
                             const subtotalCLP = precioCLP * item.cantidad;
                             const subtotalConvertido = convertirMoneda(subtotalCLP);
-                            total += subtotalCLP; // El total siempre en CLP para el pago
-                            
+                            total += subtotalCLP;
+
                             return `
                                 <tr>
                                     <td class="py-2">${prod.nombre}</td>
@@ -103,8 +115,7 @@ function mostrarCarrito() {
                     <p class="text-xs text-gray-500 mt-1">*El pago se procesará en pesos chilenos (CLP)</p>
                 </div>
             `;
-            
-            // Agregar event listener para el selector de moneda
+
             const currencySelector = document.getElementById('currency-selector-carrito');
             if (currencySelector) {
                 currencySelector.addEventListener('change', (e) => {
@@ -112,6 +123,10 @@ function mostrarCarrito() {
                     mostrarCarrito(); // Recargar carrito con nueva moneda
                 });
             }
+        })
+        .catch(error => {
+            console.error('Error al cargar productos del carrito:', error);
+            cont.innerHTML = '<p class="text-red-600 font-medium">Error al cargar el carrito. Intenta más tarde.</p>';
         });
 }
 
@@ -132,7 +147,6 @@ function formatearMoneda(valor, moneda = null) {
     try {
         return new Intl.NumberFormat('es-CL', opciones).format(valor);
     } catch (error) {
-        // Fallback si hay error con el formato
         const simbolos = { CLP: '$', USD: 'US$', EUR: '€' };
         const simbolo = simbolos[monedaAUsar] || '$';
         return `${simbolo}${valor.toFixed(monedaAUsar === 'CLP' ? 0 : 2)}`;
@@ -154,63 +168,46 @@ async function procesarCompra(total) {
     }
 
     try {
-        // Obtener carrito
         const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-        
         if (carrito.length === 0) {
             alert('El carrito está vacío.');
             return;
         }
 
-        // 1. Verificar y reducir stock ANTES de procesar el pago
         const stockResponse = await fetch('/api/productos/reducir-stock', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(carrito)
         });
 
         const stockResult = await stockResponse.json();
-        
         if (!stockResult.success) {
             alert('Error: ' + stockResult.errores.join('\n'));
             return;
         }
 
-        // 2. Si el stock se redujo correctamente, proceder con Webpay
         const response = await fetch('/api/webpay/create', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                amount: total // Siempre en CLP
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: total })
         });
 
         if (!response.ok) {
-            // Si falla Webpay, restaurar el stock
             await restaurarStock(carrito);
             throw new Error('Error al crear la transacción');
         }
 
         const data = await response.json();
-        
         if (data.error) {
-            // Si falla Webpay, restaurar el stock
             await restaurarStock(carrito);
             alert('Error: ' + data.error);
             return;
         }
 
-        // 3. Redirigir a Webpay
         if (data.url && data.token) {
-            // Guardar carrito temporalmente por si falla el pago
             localStorage.setItem('carritoTemporal', JSON.stringify(carrito));
             window.location.href = data.url + '?token_ws=' + data.token;
         } else {
-            // Si no hay URL, restaurar stock
             await restaurarStock(carrito);
             alert('Error: No se pudo obtener la URL de pago');
         }
@@ -221,19 +218,16 @@ async function procesarCompra(total) {
     }
 }
 
-// Función auxiliar para restaurar stock en caso de error
 async function restaurarStock(carrito) {
     try {
         const itemsParaRestaurar = carrito.map(item => ({
             id: item.id,
-            cantidad: -item.cantidad // Cantidad negativa para restaurar
+            cantidad: -item.cantidad
         }));
-        
+
         await fetch('/api/productos/restaurar-stock', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(itemsParaRestaurar)
         });
     } catch (error) {

@@ -1,60 +1,45 @@
-// Sistema de gestión de sesiones simplificado
-class SessionManager {
-    static obtenerUsuarioActivo() {
-        try {
-            const usuarioActivo = localStorage.getItem('usuarioActivo');
-            return usuarioActivo ? JSON.parse(usuarioActivo) : null;
-        } catch (error) {
-            console.error('Error al obtener usuario activo:', error);
-            localStorage.removeItem('usuarioActivo');
-            return null;
-        }
-    }
+// session.js — Sin uso de localStorage, completamente con backend
 
-    static guardarSesion(usuario) {
-        try {
-            localStorage.setItem('usuarioActivo', JSON.stringify(usuario));
-            console.log('✅ Sesión guardada:', usuario);
-            return true;
-        } catch (error) {
-            console.error('Error al guardar sesión:', error);
-            return false;
-        }
-    }
-
-    static cerrarSesion() {
-        localStorage.removeItem('usuarioActivo');
-        console.log('❌ Sesión cerrada');
-        return true;
-    }
-
-    static estaLogueado() {
-        return this.obtenerUsuarioActivo() !== null;
-    }
-}
-
-// Hacer SessionManager disponible globalmente
-window.SessionManager = SessionManager;
-
-// Función global para cerrar sesión
-window.cerrarSesion = function() {
-    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-        SessionManager.cerrarSesion();
-        alert('Sesión cerrada exitosamente');
-        window.location.href = 'index.html';
-    }
+// Obtener usuario desde la sesión del backend
+window.obtenerUsuarioActivo = async function() {
+  try {
+    const res = await fetch('/api/usuarios/auth/user');
+    if (!res.ok) throw new Error('No autenticado');
+    const usuario = await res.json();
+    console.log('✅ Usuario activo:', usuario.nombre, '| Rol:', usuario.rol);
+    return usuario;
+  } catch (error) {
+    console.warn('❌ Usuario no autenticado o sesión expirada');
+    return null;
+  }
 };
 
-// Verificar sesión al cargar
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🔍 Session.js cargado - verificando usuario...');
-    const usuario = SessionManager.obtenerUsuarioActivo();
-    
-    if (usuario) {
-        console.log('✅ Usuario encontrado:', usuario.nombre);
-        console.log('📧 Email:', usuario.correo);
-        console.log('🔑 Rol:', usuario.rol);
-    } else {
-        console.log('❌ No hay usuario logueado');
+// Cerrar sesión vía backend
+window.cerrarSesion = async function() {
+  if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+    try {
+      const res = await fetch('/api/usuarios/logout', { method: 'POST' });
+      if (res.ok) {
+        alert('Sesión cerrada correctamente');
+        window.location.href = 'index.html';
+      } else {
+        alert('No se pudo cerrar la sesión');
+      }
+    } catch (error) {
+      console.error('❌ Error al cerrar sesión:', error);
+      alert('Error al cerrar sesión');
     }
+  }
+};
+
+// Verificación automática al cargar el script (opcional)
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('🔍 Verificando sesión desde backend...');
+  const usuario = await obtenerUsuarioActivo();
+
+  if (!usuario) {
+    console.log('🔒 Usuario no logueado. Redirigiendo a login...');
+    // Puedes redirigir si estás en una vista privada
+    // window.location.href = 'login.html';
+  }
 });

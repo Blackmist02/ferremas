@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mensajes de Clientes | Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <header class="bg-teal-700 text-white p-4">
+    <h1 class="text-xl font-bold">Mensajes de Clientes</h1>
+  </header>
+
+  <main class="p-6 max-w-5xl mx-auto">
+    <h2 class="text-lg font-semibold mb-4">Seleccionar cliente:</h2>
+
+    <select id="usuarios-select" class="p-2 border rounded mb-6"></select>
+
+    <div id="mensajes-container" class="space-y-4"></div>
+  </main>
+
+  <script>
+    const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+    if (!usuario || usuario.rol !== 'ROLE_ADMIN') {
+      window.location.href = '404.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarUsuarios();
+    });
+
+    async function cargarUsuarios() {
+      const res = await fetch('/api/mensajes/usuarios');
+      const usuarios = await res.json();
+      const select = document.getElementById('usuarios-select');
+
+      usuarios.forEach(u => {
+        const option = document.createElement('option');
+        option.value = u.id;
+        option.textContent = `${u.nombre} (${u.correo})`;
+        select.appendChild(option);
+      });
+
+      select.addEventListener('change', () => {
+        cargarMensajesDeUsuario(select.value);
+      });
+
+      if (usuarios.length > 0) {
+        select.value = usuarios[0].id;
+        cargarMensajesDeUsuario(usuarios[0].id);
+      }
+    }
+
+    async function cargarMensajesDeUsuario(userId) {
+      const res = await fetch(`/api/mensajes/usuario/${userId}`);
+      const mensajes = await res.json();
+      const contenedor = document.getElementById('mensajes-container');
+      contenedor.innerHTML = '';
+
+      mensajes.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'bg-white p-4 rounded shadow';
+
+        const respuestaInput = document.createElement('input');
+        respuestaInput.type = 'text';
+        respuestaInput.placeholder = 'Escribe una respuesta...';
+        respuestaInput.value = m.respuesta || '';
+        respuestaInput.className = 'border rounded p-2 w-full mt-2';
+
+        const btn = document.createElement('button');
+        btn.textContent = 'Responder';
+        btn.className = 'mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded';
+        btn.onclick = async () => {
+          await fetch(`/api/mensajes/responder/${m.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ respuesta: respuestaInput.value })
+          });
+          alert('Respuesta guardada');
+        };
+
+        div.innerHTML = `
+          <p><strong>Mensaje:</strong> ${m.contenido}</p>
+          <p class="text-sm text-gray-500">Usuario ID: ${m.usuario.id}</p>
+          <p><strong>Respuesta actual:</strong> ${m.respuesta || 'Sin respuesta'}</p>
+        `;
+        div.appendChild(respuestaInput);
+        div.appendChild(btn);
+
+        contenedor.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
